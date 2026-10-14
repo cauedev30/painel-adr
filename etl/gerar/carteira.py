@@ -79,10 +79,13 @@ def _atraso(risco: str, rng) -> int | None:
 def simular_pagamentos(parcelas, risco: str, rng) -> list[tuple[int, date, int]]:
     pagamentos = []
     data_venda = parcelas[0][1]
-    for i, (_, vencimento, valor) in enumerate(parcelas):
+    for i, (tipo, vencimento, valor) in enumerate(parcelas):
         if vencimento > DATA_CORTE:
             break  # as parcelas estão em ordem de vencimento: dali para a frente, tudo é futuro
         atraso = _atraso(risco, rng)
+        if atraso is None and tipo == "chaves":
+            # as chaves saem do financiamento bancário: atrasam, mas são pagas
+            atraso = int(rng.integers(*cat.ATRASO_CHAVES_SEM_PAGAMENTO))
         if atraso is None:
             continue
         data = max(vencimento + timedelta(days=atraso), data_venda)

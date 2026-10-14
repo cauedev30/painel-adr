@@ -14,9 +14,13 @@ ID_VENDA_DIRETA = 1
 
 
 def _pesos_corretores(corretores: pd.DataFrame, rng) -> dict[int, float]:
-    """Cada corretor ganha uma posição sorteada; o peso cai com a posição e concentra as vendas."""
+    """Cada corretor ganha uma posição sorteada; o peso cai com a posição e concentra as vendas.
+
+    As melhores posições ficam com os veteranos, que já vendiam em 2023.
+    """
     ids = corretores.loc[corretores["id"] != ID_VENDA_DIRETA, "id"].tolist()
-    posicoes = rng.permutation(len(ids)) + 1
+    veteranos, novatos = ids[: cat.VETERANOS], ids[cat.VETERANOS :]
+    posicoes = list(rng.permutation(len(veteranos)) + 1) + list(rng.permutation(len(novatos)) + 1 + len(veteranos))
     return {i: 1 / p ** cat.EXPOENTE_CORRETORES for i, p in zip(ids, posicoes)}
 
 

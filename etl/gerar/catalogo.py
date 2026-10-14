@@ -74,19 +74,21 @@ BOOST_LANCAMENTO = 2.5  # a chance de venda é 2,5 vezes maior nos primeiros mes
 MESES_DE_LANCAMENTO = 3
 BOOST_VISTA_MAR = 1.8  # vista mar vende mais rápido
 PESO_VENDA_DIRETA = 0.07  # parte das vendas feitas pela própria ADR
-EXPOENTE_CORRETORES = 0.9  # peso de cada corretor = 1 / posição^expoente: concentra as vendas
+EXPOENTE_CORRETORES = 0.8  # peso de cada corretor = 1 / posição^expoente: concentra as vendas
+VETERANOS = 10  # os 10 primeiros corretores começaram em 2022 e ficam com as 10 melhores posições
 FAIXAS_DESCONTO = [((0.0, 3.0), 0.60), ((3.0, 7.0), 0.30), ((8.0, 12.0), 0.10)]
 CHANCE_INVESTIDOR = 0.70
 RISCO = {"bom": 0.72, "medio": 0.20, "ruim": 0.08}
-RISCO_SEASIDE = {"bom": 0.55, "medio": 0.23, "ruim": 0.22}  # padrão plantado: inadimplência concentrada
+RISCO_SEASIDE = {"bom": 0.45, "medio": 0.23, "ruim": 0.32}  # padrão plantado: inadimplência concentrada
 ID_SEASIDE = 2
 DESCONTO_ALTO = 8.0  # desconto a partir do qual o risco piora (padrão plantado)
-PIORA_DESCONTO_ALTO = 0.15  # pontos que saem de "bom" e vão para "ruim"
+PIORA_DESCONTO_ALTO = 0.35  # pontos que saem de "bom" e vão para "ruim"
 
 # --- Plano de pagamento e cobrança (simulado) ---
 PLANO = {"sinal": 0.10, "mensal": 0.20, "balao": 0.10, "chaves": 0.60}
 CHANCE_PAGAMENTO_PARCIAL = 0.08
-CHANCE_DISTRATO_APOS_60_DIAS = {"bom": 0.03, "medio": 0.06, "ruim": 0.30}
+ATRASO_CHAVES_SEM_PAGAMENTO = (30, 181)  # dias: o financiamento das chaves atrasa, mas sai
+CHANCE_DISTRATO_APOS_60_DIAS = {"bom": 0.03, "medio": 0.06, "ruim": 0.22}
 CHANCE_DESISTENCIA = 0.005  # distrato sem atraso antes
 
 # --- Funil (simulado) ---
