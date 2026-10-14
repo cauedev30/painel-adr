@@ -16,23 +16,43 @@ CODIFICACAO_CSV = {sujeira.CRM: "utf-8-sig", sujeira.ERP_PARCELAS: "latin-1", su
 LARGURA_MAXIMA = 50
 
 
-def _largura(serie: pd.Series, titulo: str) -> int:
-    """Largura da coluna no Excel: o maior texto da coluna, com folga."""
+FORMATO_DATA = "DD/MM/YYYY"
+FORMATO_DATA_HORA = "DD/MM/YYYY HH:MM"
+FORMATO_PORCENTAGEM = "0%"
+
+
+def _formato(serie: pd.Series, titulo: str) -> str | None:
+    """Formato de exibição da coluna no Excel; None mantém o padrão."""
     if pd.api.types.is_datetime64_any_dtype(serie):
-        maior = 16 if (serie.dropna().dt.floor("D") != serie.dropna()).any() else 10
+        com_hora = (serie.dropna().dt.floor("D") != serie.dropna()).any()
+        return FORMATO_DATA_HORA if com_hora else FORMATO_DATA
+    if titulo.endswith("(%)"):
+        return FORMATO_PORCENTAGEM
+    return None
+
+
+def _largura(serie: pd.Series, titulo: str, formato: str | None) -> int:
+    """Largura da coluna no Excel: o maior texto da coluna, com folga."""
+    if formato in (FORMATO_DATA, FORMATO_DATA_HORA):
+        maior = len(formato)
     else:
         maior = int(serie.dropna().astype(str).str.len().max()) if serie.notna().any() else 0
     return min(max(maior, len(titulo)) + 2, LARGURA_MAXIMA)
 
 
 def _gravar_xlsx(abas: dict[str, pd.DataFrame], caminho: Path) -> None:
-    with pd.ExcelWriter(caminho, engine="openpyxl", date_format="DD/MM/YYYY",
-                        datetime_format="DD/MM/YYYY HH:MM") as escritor:
+    # O formato vai célula a célula: o pandas 3 ignora o date_format e o datetime_format do ExcelWriter
+    with pd.ExcelWriter(caminho, engine="openpyxl") as escritor:
         for aba, df in abas.items():
             df.to_excel(escritor, sheet_name=aba, index=False)
             planilha = escritor.sheets[aba]
             for n, coluna in enumerate(df.columns, start=1):
-                planilha.column_dimensions[get_column_letter(n)].width = _largura(df[coluna], coluna)
+                letra = get_column_letter(n)
+                formato = _formato(df[coluna], coluna)
+                if formato:
+                    for (celula,) in planilha.iter_rows(min_row=2, min_col=n, max_col=n):
+                        celula.number_format = formato
+                planilha.column_dimensions[letra].width = _largura(df[coluna], coluna, formato)
 
 
 def gravar(brutos: dict, gabarito: dict, pasta_brutos: Path, arq_gabarito: Path) -> dict[str, int]:
