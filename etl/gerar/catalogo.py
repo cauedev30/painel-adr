@@ -13,28 +13,28 @@ EMPREENDIMENTOS = [
         "bairro": "Cabo Branco", "cidade": "João Pessoa", "status": "entregue",
         "previsao_entrega": date(2025, 8, 1), "entrega_texto": "ago/2025", "area_min": 16.43, "area_max": 39.15,
         # simulado
-        "data_lancamento": date(2023, 2, 1), "unidades": 60, "preco_m2_base": 14_200, "chance_venda_mes": 0.09,
+        "data_lancamento": date(2023, 2, 1), "unidades": 60, "preco_m2_base": 14_200, "chance_venda_mes": 0.07,
         "inicio_captacao": None, "leads_por_mes": 0,
     },
     {
         "id": 2, "nome": "Mares Seaside", "slug": "mares-seaside", "sigla": "MSS",
         "bairro": "Bessa", "cidade": "João Pessoa", "status": "em_obras",
         "previsao_entrega": date(2028, 1, 1), "entrega_texto": "jan/2028", "area_min": 18.20, "area_max": 27.55,
-        "data_lancamento": date(2024, 3, 1), "unidades": 132, "preco_m2_base": 14_600, "chance_venda_mes": 0.07,
+        "data_lancamento": date(2024, 3, 1), "unidades": 132, "preco_m2_base": 14_600, "chance_venda_mes": 0.03,
         "inicio_captacao": None, "leads_por_mes": 0,
     },
     {
         "id": 3, "nome": "Mares Seaview", "slug": "mares-seaview", "sigla": "MSV",
         "bairro": "Jardim Oceania", "cidade": "João Pessoa", "status": "em_obras",
         "previsao_entrega": date(2028, 3, 1), "entrega_texto": "mar/2028", "area_min": 18.50, "area_max": 21.81,
-        "data_lancamento": date(2024, 9, 1), "unidades": 96, "preco_m2_base": 15_500, "chance_venda_mes": 0.07,
+        "data_lancamento": date(2024, 9, 1), "unidades": 96, "preco_m2_base": 15_500, "chance_venda_mes": 0.03,
         "inicio_captacao": None, "leads_por_mes": 0,
     },
     {
         "id": 4, "nome": "Mares Bessa", "slug": "mares-bessa", "sigla": "MBE",
         "bairro": "Bessa", "cidade": "João Pessoa", "status": "em_obras",
         "previsao_entrega": date(2029, 2, 1), "entrega_texto": "fev/2029", "area_min": 18.03, "area_max": 33.04,
-        "data_lancamento": date(2025, 8, 1), "unidades": 102, "preco_m2_base": 14_900, "chance_venda_mes": 0.08,
+        "data_lancamento": date(2025, 8, 1), "unidades": 102, "preco_m2_base": 14_900, "chance_venda_mes": 0.028,
         "inicio_captacao": None, "leads_por_mes": 0,
     },
     {
@@ -86,7 +86,7 @@ PIORA_DESCONTO_ALTO = 0.15  # pontos que saem de "bom" e vão para "ruim"
 # --- Plano de pagamento e cobrança (simulado) ---
 PLANO = {"sinal": 0.10, "mensal": 0.20, "balao": 0.10, "chaves": 0.60}
 CHANCE_PAGAMENTO_PARCIAL = 0.08
-CHANCE_DISTRATO_APOS_60_DIAS = {"bom": 0.10, "medio": 0.30, "ruim": 0.60}
+CHANCE_DISTRATO_APOS_60_DIAS = {"bom": 0.03, "medio": 0.06, "ruim": 0.30}
 CHANCE_DESISTENCIA = 0.005  # distrato sem atraso antes
 
 # --- Funil (simulado) ---
