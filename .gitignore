@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+.venv/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Node
+node_modules/
+web/dist/
+
+# Gerados pelo pipeline (o CI gera de novo a cada commit)
+dados/limpos/
+web/public/banco.tar.gz
