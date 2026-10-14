@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 
 from etl.config import DATA_CORTE
-from etl.gerar import carteira
+from etl.gerar import carteira, catalogo
 
 
 @pytest.mark.parametrize("semente", range(5))
@@ -89,5 +89,7 @@ def test_distrato_so_depois_de_60_dias_de_atraso_ou_por_desistencia():
         assert all(venc <= distrato for _, venc, _ in parcelas)
         assert all(data <= distrato and i < len(parcelas) for i, data, _ in restantes)
         distratos_com_atraso += 1
-    # cliente ruim quase sempre passa de 60 dias de atraso em algum momento: muitos distratos
-    assert distratos_com_atraso > 100
+    # cliente ruim quase sempre passa de 60 dias de atraso em algum momento,
+    # então a taxa de distrato fica perto da chance do catálogo
+    chance = catalogo.CHANCE_DISTRATO_APOS_60_DIAS["ruim"]
+    assert chance - 0.08 < distratos_com_atraso / 300 < chance + 0.08
