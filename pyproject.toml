@@ -1,0 +1,9 @@
+[project]
+name = "painel-adr"
+version = "0.1.0"
+description = "Pipeline de dados do Painel de Dados ADR"
+requires-python = ">=3.12"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

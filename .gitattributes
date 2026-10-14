@@ -1,0 +1,12 @@
+# Tudo que é texto fica com fim de linha \n no repositório e na cópia local
+* text=auto eol=lf
+
+# Binários: nunca converter
+*.xlsx binary
+*.png binary
+*.jpg binary
+*.webp binary
+*.gz binary
+
+# Os brutos imitam exports de sistemas: os bytes ficam exatamente como o gerador gravou
+dados/brutos/*.csv -text
