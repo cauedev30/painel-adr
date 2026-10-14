@@ -41,7 +41,7 @@ def test_datas_e_valores_convertidos_batem_com_a_verdade(convertido, verdade, ga
     # ficam de fora as duplicatas do R1 (não existem na verdade) e os leads mantidos, cujas datas de
     # visita e proposta foram para a duplicata: quem as recupera é a mesclagem do R1 (tarefa 3.3)
     mantidos = {c["mantido"] for c in gabarito["regras"]["R1"]["casos"]}
-    comuns = certo.index.difference(sorted(mantidos))
+    comuns = certo.index.difference(sorted(mantidos)).intersection(lead.index)  # sem os que foram para a quarentena
     for coluna in ["data_entrada", "data_visita", "data_proposta"]:
         vazio = pd.Timestamp(0)
         assert (lead.loc[comuns, coluna].fillna(vazio) == certo.loc[comuns, coluna].fillna(vazio)).all(), coluna
@@ -60,4 +60,5 @@ def test_conversao_de_dinheiro_registrada_em_todas_as_linhas_do_erp(convertido, 
     r5 = {r.origem: r for r in convertido.registros if r.regra == "R5" and r.acao == "convertido"}
     assert r5["erp_parcelas.csv"].linhas_afetadas == len(lidos["parcela"])
     assert r5["erp_baixas.csv"].linhas_afetadas == len(lidos["pagamento"])
-    assert convertido.quarentena == []
+    # converter formato não barra linha nenhuma; quem barra são as regras de quarentena (tarefa 3.6)
+    assert r4_datas.converter(lidos).quarentena == [] and r5_valores.converter(lidos).quarentena == []

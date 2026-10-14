@@ -61,7 +61,8 @@ def tratado(lidos):
 
 def test_duplicatas_removidas_sao_exatamente_as_do_gabarito(tratado, lidos, gabarito):
     casos = gabarito["regras"]["R1"]["casos"]
-    removidos = set(lidos["lead"]["id"]) - set(tratado.tabelas["lead"]["id"])
+    em_quarentena = {q["registro"]["id"] for q in tratado.quarentena if q["origem"] == "crm_leads.csv"}
+    removidos = set(lidos["lead"]["id"]) - set(tratado.tabelas["lead"]["id"]) - em_quarentena
     assert removidos == {c["id"] for c in casos}
     mesclado = next(r for r in tratado.registros if r.regra == "R1" and r.acao == "mesclado")
     assert set(mesclado.ids) == removidos and mesclado.linhas_afetadas == len(casos)
@@ -70,18 +71,17 @@ def test_duplicatas_removidas_sao_exatamente_as_do_gabarito(tratado, lidos, gaba
 def test_lead_mantido_fica_igual_a_verdade(tratado, verdade, gabarito):
     lead = tratado.tabelas["lead"].set_index("id")
     certo = verdade["lead"].set_index("id")
-    nome_do_corretor = verdade["corretor"].set_index("id")["nome"]
     mantidos = sorted({c["mantido"] for c in gabarito["regras"]["R1"]["casos"]})
     for coluna in ["telefone", "email", "data_entrada", "etapa", "motivo_perda"]:
         assert lead.loc[mantidos, coluna].fillna("").tolist() == certo.loc[mantidos, coluna].fillna("").tolist(), coluna
     for coluna in ["data_visita", "data_proposta"]:
         vazio = pd.Timestamp(0)
         assert (lead.loc[mantidos, coluna].fillna(vazio) == certo.loc[mantidos, coluna].fillna(vazio)).all(), coluna
-    assert (lead.loc[mantidos, "corretor_nome"].fillna("").tolist()
-            == certo.loc[mantidos, "corretor_id"].map(nome_do_corretor).fillna("").tolist())
+    assert lead.loc[mantidos, "corretor_id"].fillna(0).tolist() == certo.loc[mantidos, "corretor_id"].fillna(0).tolist()
 
 
 def test_todo_telefone_vira_o_da_verdade(tratado, verdade):
     lead = tratado.tabelas["lead"].set_index("id")["telefone"]
     certo = verdade["lead"].set_index("id")["telefone"]
-    assert lead.loc[certo.index].tolist() == certo.tolist()
+    comuns = certo.index.intersection(lead.index)  # sem os que foram para a quarentena
+    assert lead.loc[comuns].tolist() == certo.loc[comuns].tolist()
