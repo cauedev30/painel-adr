@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { PADRAO, TELAS, escreverHash, lerHash, paramsDaRota, periodoAnterior } from '../../src/navegacao/rotas.ts'
+import {
+  MESES_DOS_DADOS, PADRAO, PRIMEIRO_MES, TELAS, ULTIMO_MES, escreverHash, lerHash, paramsDaRota, periodoAnterior,
+} from '../../src/navegacao/rotas.ts'
 
 describe('as telas', () => {
   it('são 6, com ids únicos, e a primeira é a visão geral', () => {
@@ -41,6 +43,15 @@ describe('lerHash e escreverHash', () => {
 
   it('guarda os outros parâmetros em extra', () => {
     expect(lerHash('#/console?consulta=dados%2Fder').extra).toEqual({ consulta: 'dados/der' })
+  })
+})
+
+describe('os meses do filtro', () => {
+  it('vão do primeiro ao último mês dos dados, sem pular nenhum', () => {
+    expect(MESES_DOS_DADOS[0]).toBe(PRIMEIRO_MES)
+    expect(MESES_DOS_DADOS.at(-1)).toBe(ULTIMO_MES)
+    expect(new Set(MESES_DOS_DADOS).size).toBe(MESES_DOS_DADOS.length)
+    expect(MESES_DOS_DADOS).toContain('2024-02')
   })
 })
 

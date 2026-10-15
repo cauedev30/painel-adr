@@ -1,0 +1,124 @@
+.barra {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-6);
+  padding: var(--esp-5) var(--esp-4);
+  background: var(--superficie);
+  border-right: 1px solid var(--borda);
+  overflow-y: auto;
+}
+
+.topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.marca {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-2);
+  text-decoration: none;
+}
+
+.marca img {
+  width: 120px;
+  height: auto;
+}
+
+.subtitulo {
+  font-family: var(--fonte-titulo);
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--texto-2);
+}
+
+.botaoMenu {
+  display: none;
+  background: none;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-pequeno);
+  padding: var(--esp-2);
+}
+
+.menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-1);
+}
+
+.menu a {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-3);
+  padding: var(--esp-2) var(--esp-3);
+  border-radius: var(--raio-pequeno);
+  color: var(--texto-2);
+  text-decoration: none;
+  border-left: 2px solid transparent;
+}
+
+.menu a:hover {
+  color: var(--texto);
+  background: var(--superficie-2);
+}
+
+/* a tela ativa: o destaque em cobre, como nos gráficos */
+.menu a[aria-current='page'] {
+  color: var(--texto);
+  background: var(--superficie-2);
+  border-left-color: var(--cobre);
+}
+
+.menu a[aria-current='page'] svg {
+  color: var(--cobre);
+}
+
+.rodape {
+  margin-top: auto;
+}
+
+/* celular: a barra vira uma faixa no topo, e as telas abrem num menu (D5.9) */
+@media (max-width: 899px) {
+  .barra {
+    height: auto;
+    gap: 0;
+    padding: var(--esp-3) var(--esp-4);
+    border-right: 0;
+    border-bottom: 1px solid var(--borda);
+    z-index: 10;
+    overflow: visible;
+  }
+
+  .marca {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--esp-3);
+  }
+
+  .marca img {
+    width: 80px;
+  }
+
+  .botaoMenu {
+    display: inline-flex;
+  }
+
+  .menu,
+  .rodape {
+    display: none;
+  }
+
+  .barra[data-aberto='true'] .menu,
+  .barra[data-aberto='true'] .rodape {
+    display: block;
+    margin-top: var(--esp-4);
+  }
+}

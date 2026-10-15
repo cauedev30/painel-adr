@@ -2,13 +2,14 @@
 // Assim o link com filtro pode ser compartilhado, e o GitHub Pages não dá 404 ao recarregar a página.
 import { EMPREENDIMENTOS } from '../empreendimentos.ts'
 
+// filtros: a tela tem cartões que mudam com o período e o empreendimento (Dados e Console não têm)
 export const TELAS = [
-  { id: 'visao-geral', nome: 'Visão geral', icone: 'painel' },
-  { id: 'vendas-estoque', nome: 'Vendas e estoque', icone: 'predio' },
-  { id: 'funil-corretores', nome: 'Funil e corretores', icone: 'funil' },
-  { id: 'recebiveis', nome: 'Recebíveis', icone: 'moeda' },
-  { id: 'dados', nome: 'Dados', icone: 'banco' },
-  { id: 'console', nome: 'Console SQL', icone: 'terminal' },
+  { id: 'visao-geral', nome: 'Visão geral', icone: 'painel', filtros: true },
+  { id: 'vendas-estoque', nome: 'Vendas e estoque', icone: 'predio', filtros: true },
+  { id: 'funil-corretores', nome: 'Funil e corretores', icone: 'funil', filtros: true },
+  { id: 'recebiveis', nome: 'Recebíveis', icone: 'moeda', filtros: true },
+  { id: 'dados', nome: 'Dados', icone: 'banco', filtros: false },
+  { id: 'console', nome: 'Console SQL', icone: 'terminal', filtros: false },
 ] as const
 
 export type IdTela = (typeof TELAS)[number]['id']
@@ -25,6 +26,7 @@ export type Rota = {
 // o período dos dados simulados e o filtro padrão do painel: os últimos 12 meses (D4.2)
 export const PRIMEIRO_MES = '2023-01'
 export const ULTIMO_MES = '2026-09'
+export const DATA_DE_CORTE = '2026-09-30'
 export const PADRAO: Rota = { tela: 'visao-geral', de: '2025-10', ate: '2026-09', emp: null, extra: {} }
 
 const ANO_MES = /^\d{4}-(0[1-9]|1[0-2])$/
@@ -68,6 +70,9 @@ function ultimoDia(anoMes: string): string {
   const [ano, mes] = anoMes.split('-').map(Number)
   return `${anoMes}-${String(new Date(Date.UTC(ano, mes, 0)).getUTCDate()).padStart(2, '0')}`
 }
+
+/** Todos os meses dos dados, de jan/2023 a set/2026, em AAAA-MM (as opções dos filtros de período). */
+export const MESES_DOS_DADOS: string[] = Array.from({ length: 45 }, (_, i) => somarMeses(PRIMEIRO_MES, i))
 
 /** Os parâmetros $1, $2 e $3 das consultas filtráveis: início no dia 1, fim no último dia do mês. */
 export function paramsDaRota(rota: Rota): [string, string, number | null] {

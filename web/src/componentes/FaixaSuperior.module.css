@@ -1,0 +1,35 @@
+.faixa {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--esp-4) var(--esp-6);
+  padding: var(--esp-5) var(--esp-6);
+  border-bottom: 1px solid var(--borda);
+}
+
+.titulo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-1);
+}
+
+.titulo h1 {
+  font-size: 1.375rem;
+  letter-spacing: 0.14em;
+}
+
+.corte {
+  font-size: var(--tamanho-pequeno);
+  color: var(--texto-2);
+}
+
+@media (max-width: 899px) {
+  .faixa {
+    padding: var(--esp-4);
+  }
+
+  .titulo h1 {
+    font-size: 1.0625rem;
+  }
+}

@@ -1,0 +1,52 @@
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--esp-3);
+}
+
+.filtros label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-1);
+  font-size: var(--tamanho-pequeno);
+  color: var(--texto-2);
+}
+
+.filtros select {
+  min-width: 112px;
+  padding: var(--esp-2) var(--esp-3);
+  background: var(--superficie-2);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-pequeno);
+  color: var(--texto);
+  font-size: var(--tamanho-texto);
+}
+
+.filtros select:hover {
+  border-color: var(--texto-2);
+}
+
+.empreendimento select {
+  min-width: 200px;
+}
+
+@media (max-width: 899px) {
+  .filtros {
+    width: 100%;
+  }
+
+  .filtros label {
+    flex: 1 1 120px;
+  }
+
+  .filtros select,
+  .empreendimento select {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .empreendimento {
+    flex-basis: 100%;
+  }
+}

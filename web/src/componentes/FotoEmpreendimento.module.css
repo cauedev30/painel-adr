@@ -1,0 +1,34 @@
+.foto,
+.semFoto {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--raio-pequeno);
+}
+
+.foto {
+  object-fit: cover;
+  background: var(--superficie-2);
+}
+
+.semFoto {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--esp-1);
+  background: repeating-linear-gradient(135deg, var(--superficie-2) 0 12px, var(--superficie) 12px 24px);
+  border: 1px solid var(--borda);
+  font-family: var(--fonte-titulo);
+  font-size: var(--tamanho-pequeno);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  text-align: center;
+  padding: var(--esp-3);
+}
+
+.semFoto small {
+  font-family: var(--fonte-texto);
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--texto-2);
+}
