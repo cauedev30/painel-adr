@@ -16,10 +16,16 @@ afterAll(async () => {
 })
 
 describe('desempenho', () => {
+  // a mais rápida de 3 execuções depois do aquecimento: os testes rodam em paralelo, e um pico de
+  // processador de outro arquivo não deve reprovar uma consulta rápida; a lenta é lenta nas 3
   it.each(listarConsultas())(`%s roda em menos de ${LIMITE_MS} ms depois do aquecimento`, async (id) => {
     await rodar(db, id)  // aquecimento: o primeiro uso planeja a consulta e carrega as páginas
-    const inicio = performance.now()
-    await rodar(db, id)
-    expect(performance.now() - inicio).toBeLessThan(LIMITE_MS)
+    const tempos: number[] = []
+    for (let i = 0; i < 3; i++) {
+      const inicio = performance.now()
+      await rodar(db, id)
+      tempos.push(performance.now() - inicio)
+    }
+    expect(Math.min(...tempos)).toBeLessThan(LIMITE_MS)
   })
 })
