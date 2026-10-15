@@ -23,6 +23,8 @@ type Props<T> = {
   /** O gráfico do cartão; o cartão que não é um gráfico só (fotos, vários gráficos pequenos) usa `conteudo`. */
   grafico?: (linhas: T[]) => EChartsOption
   conteudo?: (linhas: T[]) => ReactNode
+  /** Como o botão chama o `conteudo` na volta da tabela: "ver como cartões", "ver como ranking". */
+  nomeDoConteudo?: string
   colunas: Coluna<T>[]
   formatoDoValor?: (valor: number) => string
   altura?: number
@@ -32,7 +34,7 @@ type Props<T> = {
  * O cartão do painel (seção 6.2): pergunta, frase-resposta e gráfico, com "Ver SQL" e "ver como
  * tabela". Enquanto os filtros mudam, o gráfico anterior fica na tela, apagado, até o novo chegar.
  */
-export function Cartao<T>({ id, titulo, consulta, params, resposta, grafico, conteudo, colunas, formatoDoValor = inteiro, altura }: Props<T>) {
+export function Cartao<T>({ id, titulo, consulta, params, resposta, grafico, conteudo, nomeDoConteudo = 'cartões', colunas, formatoDoValor = inteiro, altura }: Props<T>) {
   const { linhas, erro, carregando, ms } = usarConsulta<T>(consulta, params)
   const [comoTabela, setComoTabela] = useState(false)
   const [sqlAberto, setSqlAberto] = useState(false)
@@ -72,7 +74,7 @@ export function Cartao<T>({ id, titulo, consulta, params, resposta, grafico, con
         </button>
         <button type="button" aria-pressed={comoTabela} onClick={() => setComoTabela((t) => !t)}>
           <Icone nome={comoTabela ? 'grafico' : 'tabela'} tamanho={16} />
-          {comoTabela ? (conteudo ? 'ver como cartões' : 'ver como gráfico') : 'ver como tabela'}
+          {comoTabela ? (conteudo ? `ver como ${nomeDoConteudo}` : 'ver como gráfico') : 'ver como tabela'}
         </button>
         {ms !== null && <span className={css.tempo}>consulta em {inteiro(Math.max(1, Math.round(ms)))} ms</span>}
       </footer>

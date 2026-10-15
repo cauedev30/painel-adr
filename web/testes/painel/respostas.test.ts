@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { GLOSSARIO } from '../../src/glossario.ts'
 import {
-  KPIS, type LinhaEmpreendimento, lerKpi, respostaDistribuicao, respostaEmpreendimentos, respostaEstatisticas, respostaRitmo,
-  respostaVendasMensais, respostaVistaMar,
+  KPIS, type LinhaEmpreendimento, type LinhaRanking, canalQueMaisConverte, lerKpi, respostaCanais, respostaDistribuicao, respostaEmpreendimentos, respostaEstatisticas, respostaRitmo,
+  respostaFunil, respostaRanking, respostaVendasMensais, respostaVistaMar, variacaoDePosicao,
 } from '../../src/telas/respostas.ts'
 import { abrirBanco, rodar } from '../apoio/banco.ts'
 
@@ -105,5 +105,44 @@ describe('frases de Vendas e estoque', () => {
   it('o glossário explica todo termo da tabela de estatísticas', () => {
     expect(Object.keys(GLOSSARIO).sort()).toEqual(['desvio_padrao', 'media', 'mediana', 'moda', 'p25', 'p50', 'p75', 'p90'])
     for (const { explicacao } of Object.values(GLOSSARIO)) expect(explicacao.length).toBeGreaterThan(20)
+  })
+})
+
+describe('frases de Funil e corretores', () => {
+  it('funil: quantos viraram venda e o maior gargalo', () => {
+    expect(respostaFunil([
+      { etapa: 'lead', ordem: 1, leads: 4656, conversao: null },
+      { etapa: 'visita', ordem: 2, leads: 436, conversao: 0.0936 },
+      { etapa: 'proposta', ordem: 3, leads: 145, conversao: 0.3326 },
+      { etapa: 'venda', ordem: 4, leads: 53, conversao: 0.3655 },
+    ])).toBe('Dos 4.656 leads do período, 53 viraram venda (1,1%); o maior gargalo é de lead para visita (9,4%)')
+    expect(respostaFunil([{ etapa: 'lead', ordem: 1, leads: 0, conversao: null }])).toBe('Nenhum lead entrou no período')
+  })
+
+  it('canais: volume contra conversão, só entre canais com volume', () => {
+    const c = (canal: string, leads: number, vendas: number) => ({ canal, leads, vendas, conversao: vendas / leads })
+    const linhas = [c('instagram', 800, 4), c('indicacao', 200, 10), c('evento', 5, 3)]
+    expect(canalQueMaisConverte(linhas)!.canal).toBe('indicacao')
+    expect(respostaCanais(linhas)).toBe('O Instagram traz 80% dos leads e converte 0,5%; quem mais converte é a indicação, com 5,0%')
+    expect(respostaCanais([c('site', 100, 5), c('tiktok', 50, 0)])).toBe('O site traz 67% dos leads e também é o que mais converte (5,0%)')
+    expect(respostaCanais([c('site', 100, 0)])).toBe('O site traz 100% dos leads, e nenhum canal com volume chegou à venda')
+  })
+
+  const r = (nome: string, posicao: number, anterior: number | null, vendas = 3): LinhaRanking => ({
+    corretor_id: 1, nome, imobiliaria: null, vendas, vgv: 1_000_000, posicao, posicao_anterior: anterior,
+    variacao: anterior === null ? null : anterior - posicao,
+  })
+
+  it('variação de posição: subiu, caiu, igual e novo', () => {
+    expect(variacaoDePosicao(r('A', 3, 5))).toEqual({ seta: '▲', texto: '2', descricao: 'subiu 2 posições', tom: 'bom' })
+    expect(variacaoDePosicao(r('A', 6, 5))).toEqual({ seta: '▼', texto: '1', descricao: 'caiu 1 posição', tom: 'ruim' })
+    expect(variacaoDePosicao(r('A', 1, 1)).descricao).toBe('mesma posição')
+    expect(variacaoDePosicao(r('A', 4, null)).texto).toBe('novo')
+  })
+
+  it('ranking: o líder e quem mais subiu; empate no topo', () => {
+    expect(respostaRanking([r('Kaique Mendes', 1, 1, 12), r('Luísa Lopes', 3, 5), r('Luiza das Neves', 6, 14)]))
+      .toBe('Kaique Mendes lidera com 12 vendas (R$ 1,0 mi); quem mais subiu foi Luiza das Neves, 8 posições')
+    expect(respostaRanking([r('A', 1, null, 2), r('B', 1, null, 2)])).toBe('2 corretores dividem o 1º lugar, com 2 vendas cada')
   })
 })

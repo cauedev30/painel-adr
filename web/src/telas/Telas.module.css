@@ -160,6 +160,81 @@
   font-weight: 600;
 }
 
+/* ---- Funil e corretores ---- */
+
+.rolagemRanking {
+  max-height: 440px;
+  overflow: auto;
+}
+
+.ranking {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ranking th,
+.ranking td {
+  padding: var(--esp-2) var(--esp-3);
+  border-bottom: 1px solid var(--borda);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.ranking th {
+  position: sticky;
+  top: 0;
+  background: var(--superficie);
+  font-size: var(--tamanho-pequeno);
+  font-weight: 400;
+  color: var(--texto-2);
+}
+
+.ranking tbody tr:hover {
+  background: var(--superficie-2);
+}
+
+/* o 1º lugar com a posição em cobre */
+.ranking tbody tr:first-child td:first-child {
+  color: var(--cobre-forte);
+  font-weight: 600;
+}
+
+.ranking .direita {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.corretor {
+  display: block;
+  font-weight: 600;
+}
+
+.imobiliaria {
+  display: block;
+  font-size: var(--tamanho-pequeno);
+  color: var(--texto-2);
+}
+
+.setaPosicao {
+  color: var(--texto-2);
+}
+
+.setaPosicao[data-tom='bom'] {
+  color: var(--bom);
+}
+
+.setaPosicao[data-tom='ruim'] {
+  color: var(--ruim);
+}
+
+.novo {
+  font-size: 0.75rem;
+  color: var(--texto-2);
+  border: 1px solid var(--borda);
+  border-radius: 999px;
+  padding: 0 var(--esp-2);
+}
+
 /* gráficos pequenos lado a lado (seção 6.3) */
 .multiplos {
   list-style: none;

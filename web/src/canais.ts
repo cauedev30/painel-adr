@@ -11,9 +11,10 @@ export const NOMES_DOS_CANAIS: Record<string, { nome: string; artigo: 'o' | 'a' 
   outro: { nome: 'outros', artigo: 'o' },
 }
 
-/** O nome do canal para mostrar; canal desconhecido aparece como está no banco. */
+/** O nome do canal num rótulo ou tabela, com maiúscula: "Site", "Indicação"; o desconhecido sai como está no banco. */
 export function nomeDoCanal(canal: string): string {
-  return NOMES_DOS_CANAIS[canal]?.nome ?? canal
+  const nome = NOMES_DOS_CANAIS[canal]?.nome ?? canal
+  return nome.charAt(0).toUpperCase() + nome.slice(1)
 }
 
 /** "o Instagram", "a indicação". */

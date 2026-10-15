@@ -1,5 +1,7 @@
 // As frases-resposta dos cartões (seção 6.2): calculadas das linhas da consulta, nunca escritas à mão.
 // Funções puras, testadas em web/testes/painel/respostas.test.ts.
+import { comArtigo } from '../canais.ts'
+import { MIN_LEADS_CANAL } from '../conclusoes.ts'
 import { type Variacao, inteiro, mes, moedaCompacta, pct, reais, variacao } from '../formatar.ts'
 
 export type MesDeVendas = { mes: string; vendas: number; meta: number; media_movel_3m: number }
@@ -119,4 +121,74 @@ export function respostaVistaMar(linhas: LinhaVistaMar[]): string {
   const preco = `Com vista mar, o m² sai ${pct(Math.abs(premio), 0)} ${premio >= 0 ? 'mais caro' : 'mais barato'}`
   if (com.pct_vendidas_6_meses === null || sem.pct_vendidas_6_meses === null) return preco
   return `${preco}, e ${pct(com.pct_vendidas_6_meses, 0)} das unidades venderam em 6 meses, contra ${pct(sem.pct_vendidas_6_meses, 0)} sem vista`
+}
+
+// ---- Funil e corretores ----
+
+export type LinhaFunil = { etapa: string; ordem: number; leads: number; conversao: number | null }
+
+export const NOMES_DAS_ETAPAS: Record<string, string> = { lead: 'Lead', visita: 'Visita', proposta: 'Proposta', venda: 'Venda' }
+
+/** "Dos 4.656 leads do período, 53 viraram venda (1,1%); o maior gargalo é de lead para visita (9,4%)". */
+export function respostaFunil(linhas: LinhaFunil[]): string {
+  const [primeira] = linhas
+  const ultima = linhas.at(-1)!
+  if (primeira.leads === 0) return 'Nenhum lead entrou no período'
+  const vendas = ultima.leads === 1 ? '1 virou venda' : `${inteiro(ultima.leads)} viraram venda`
+  const passos = linhas.filter((l) => l.conversao !== null)
+  const gargalo = passos.reduce((a, b) => (b.conversao! < a.conversao! ? b : a))
+  const anterior = linhas.find((l) => l.ordem === gargalo.ordem - 1)!
+  return `Dos ${inteiro(primeira.leads)} leads do período, ${vendas} (${pct(ultima.leads / primeira.leads)}); `
+    + `o maior gargalo é de ${anterior.etapa} para ${gargalo.etapa} (${pct(gargalo.conversao!)})`
+}
+
+export type LinhaCanal = { canal: string; leads: number; vendas: number; conversao: number }
+
+/** O canal de maior conversão entre os que têm volume (o mesmo critério das conclusões); nulo se nenhum vendeu. */
+export function canalQueMaisConverte(linhas: LinhaCanal[]): LinhaCanal | null {
+  const candidatos = linhas.filter((l) => l.leads >= MIN_LEADS_CANAL && l.vendas > 0)
+  return candidatos.length === 0 ? null : candidatos.reduce((a, b) => (b.conversao > a.conversao ? b : a))
+}
+
+export function respostaCanais(linhas: LinhaCanal[]): string {
+  const total = linhas.reduce((s, l) => s + l.leads, 0)
+  const volume = linhas.reduce((a, b) => (b.leads > a.leads ? b : a))
+  const melhor = canalQueMaisConverte(linhas)
+  const traz = `${comArtigo(volume.canal)} traz ${pct(volume.leads / total, 0)} dos leads`
+  const frase = traz.charAt(0).toUpperCase() + traz.slice(1)
+  if (melhor === null) return `${frase}, e nenhum canal com volume chegou à venda`
+  if (melhor.canal === volume.canal) return `${frase} e também é o que mais converte (${pct(melhor.conversao)})`
+  return `${frase} e converte ${pct(volume.conversao)}; quem mais converte é ${comArtigo(melhor.canal)}, com ${pct(melhor.conversao)}`
+}
+
+export type LinhaRanking = {
+  corretor_id: number; nome: string; imobiliaria: string | null; vendas: number; vgv: number
+  posicao: number; posicao_anterior: number | null; variacao: number | null
+}
+
+export type VariacaoDePosicao = { seta: '▲' | '▼' | '=' | ''; texto: string; descricao: string; tom: 'bom' | 'ruim' | 'neutro' }
+
+/** ▲ 2 (subiu 2 posições), ▼ 1, = (mesma posição) ou "novo" (não vendeu no período anterior). */
+export function variacaoDePosicao({ posicao_anterior, variacao: v }: LinhaRanking): VariacaoDePosicao {
+  if (posicao_anterior === null || v === null) return { seta: '', texto: 'novo', descricao: 'não vendeu no período anterior', tom: 'neutro' }
+  if (v === 0) return { seta: '=', texto: '', descricao: 'mesma posição', tom: 'neutro' }
+  const n = Math.abs(v)
+  const posicoes = n === 1 ? '1 posição' : `${inteiro(n)} posições`
+  return v > 0
+    ? { seta: '▲', texto: inteiro(n), descricao: `subiu ${posicoes}`, tom: 'bom' }
+    : { seta: '▼', texto: inteiro(n), descricao: `caiu ${posicoes}`, tom: 'ruim' }
+}
+
+/** "Kaique Mendes lidera com 12 vendas (R$ 4,4 mi); quem mais subiu foi Luiza das Neves, 8 posições". */
+export function respostaRanking(linhas: LinhaRanking[]): string {
+  const [lider] = linhas
+  const empatados = linhas.filter((l) => l.posicao === 1)
+  const vendas = lider.vendas === 1 ? '1 venda' : `${inteiro(lider.vendas)} vendas`
+  const topo = empatados.length > 1
+    ? `${empatados.length} corretores dividem o 1º lugar, com ${vendas} cada`
+    : `${lider.nome} lidera com ${vendas} (${moedaCompacta(lider.vgv)})`
+  const subiram = linhas.filter((l) => (l.variacao ?? 0) > 0)
+  if (subiram.length === 0) return topo
+  const salto = subiram.reduce((a, b) => (b.variacao! > a.variacao! ? b : a))
+  return `${topo}; quem mais subiu foi ${salto.nome}, ${variacaoDePosicao(salto).descricao.replace('subiu ', '')}`
 }
