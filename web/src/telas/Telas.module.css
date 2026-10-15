@@ -235,6 +235,72 @@
   padding: 0 var(--esp-2);
 }
 
+/* ---- Recebíveis ---- */
+
+/* dois cartões lado a lado no computador, empilhados no celular */
+.lado {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: var(--esp-5);
+}
+
+.rolagemMapa {
+  overflow-x: auto;
+}
+
+.mapa {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 2px;
+}
+
+.mapa th,
+.mapa td {
+  padding: var(--esp-2) var(--esp-3);
+  white-space: nowrap;
+}
+
+.mapa thead th {
+  font-size: var(--tamanho-pequeno);
+  font-weight: 400;
+  color: var(--texto-2);
+  text-align: right;
+}
+
+.mapa thead th:first-child,
+.mapa tbody th {
+  text-align: left;
+}
+
+.mapa tbody th {
+  font-weight: 400;
+  font-size: var(--tamanho-pequeno);
+}
+
+.mapa td {
+  text-align: right;
+  border-radius: var(--raio-pequeno);
+  background: var(--superficie-2);
+}
+
+.numerosGrandes {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-4) var(--esp-7);
+}
+
+.numerosGrandes dt {
+  font-size: var(--tamanho-pequeno);
+  color: var(--texto-2);
+}
+
+.numerosGrandes dd {
+  margin: 0;
+  font-size: var(--tamanho-numero);
+  font-weight: 600;
+}
+
 /* gráficos pequenos lado a lado (seção 6.3) */
 .multiplos {
   list-style: none;

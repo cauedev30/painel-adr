@@ -3,6 +3,7 @@
 import { comArtigo } from '../canais.ts'
 import { MIN_LEADS_CANAL } from '../conclusoes.ts'
 import { type Variacao, inteiro, mes, moedaCompacta, pct, reais, variacao } from '../formatar.ts'
+import { type Rota, periodoAnterior } from '../navegacao/rotas.ts'
 
 export type MesDeVendas = { mes: string; vendas: number; meta: number; media_movel_3m: number }
 
@@ -29,17 +30,30 @@ export type DefinicaoKpi = {
   modo: 'relativa' | 'pontos'
   /** No estoque e na inadimplência, subir é ruim: a cor da seta se inverte. */
   subirEhBom: boolean
+  /**
+   * Contra o quê o valor_anterior compara: o período anterior de mesma duração (padrão), o mês anterior
+   * ao último do período, ou o fim do período anterior (KPI que é foto de um dia: estoque, carteira).
+   */
+  comparacao?: 'periodo' | 'mes' | 'fim'
 }
 
 /** Os 6 KPIs da visão geral (seção 6.1), com as definições da seção 3.4. */
 export const KPIS: DefinicaoKpi[] = [
   { id: 'vgv', titulo: 'VGV vendido', consulta: 'visao-geral/kpi_vgv', formato: moedaCompacta, modo: 'relativa', subirEhBom: true },
   { id: 'vso', titulo: 'VSO', consulta: 'visao-geral/kpi_vso', formato: (v) => pct(v), modo: 'pontos', subirEhBom: true },
-  { id: 'estoque', titulo: 'Estoque', consulta: 'visao-geral/kpi_estoque', formato: (v) => `${inteiro(v)} unidades`, modo: 'relativa', subirEhBom: false },
+  { id: 'estoque', titulo: 'Estoque', consulta: 'visao-geral/kpi_estoque', formato: (v) => `${inteiro(v)} unidades`, modo: 'relativa', subirEhBom: false, comparacao: 'fim' },
   { id: 'ticket_medio', titulo: 'Ticket médio', consulta: 'visao-geral/kpi_ticket_medio', formato: moedaCompacta, modo: 'relativa', subirEhBom: true },
   { id: 'preco_m2', titulo: 'Preço por m²', consulta: 'visao-geral/kpi_preco_m2', formato: reais, modo: 'relativa', subirEhBom: true },
-  { id: 'inadimplencia', titulo: 'Inadimplência', consulta: 'visao-geral/kpi_inadimplencia', formato: (v) => pct(v), modo: 'pontos', subirEhBom: false },
+  { id: 'inadimplencia', titulo: 'Inadimplência', consulta: 'visao-geral/kpi_inadimplencia', formato: (v) => pct(v), modo: 'pontos', subirEhBom: false, comparacao: 'fim' },
 ]
+
+/** "out/2024–set/2025" (período anterior), "ago/2026" (mês anterior) ou "fim de set/2025" (foto de um dia). */
+export function textoDaComparacao(kpi: DefinicaoKpi, rota: Rota): string {
+  if (kpi.comparacao === 'mes') return mes(periodoAnterior({ ...rota, de: rota.ate }).de)
+  const anterior = periodoAnterior(rota)
+  if (kpi.comparacao === 'fim') return `fim de ${mes(anterior.ate)}`
+  return anterior.de === anterior.ate ? mes(anterior.de) : `${mes(anterior.de)}–${mes(anterior.ate)}`
+}
 
 export type LeituraKpi = { valor: string; variacao: Variacao; tom: 'bom' | 'ruim' | 'neutro' }
 
@@ -191,4 +205,84 @@ export function respostaRanking(linhas: LinhaRanking[]): string {
   if (subiram.length === 0) return topo
   const salto = subiram.reduce((a, b) => (b.variacao! > a.variacao! ? b : a))
   return `${topo}; quem mais subiu foi ${salto.nome}, ${variacaoDePosicao(salto).descricao.replace('subiu ', '')}`
+}
+
+// ---- Recebíveis ----
+
+/** Os KPIs da seção 6.1, tela 4; a inadimplência é a mesma consulta da visão geral. */
+export const KPIS_RECEBIVEIS: DefinicaoKpi[] = [
+  { id: 'a_receber_12m', titulo: 'A receber em 12 meses', consulta: 'recebiveis/kpi_a_receber_12m', formato: moedaCompacta, modo: 'relativa', subirEhBom: true, comparacao: 'fim' },
+  { id: 'recebido_mes', titulo: 'Recebido no último mês', consulta: 'recebiveis/kpi_recebido_mes', formato: moedaCompacta, modo: 'relativa', subirEhBom: true, comparacao: 'mes' },
+  KPIS.find((k) => k.id === 'inadimplencia')!,
+]
+
+export type LinhaPrevistoRecebido = { mes: string; previsto: number; recebido: number }
+
+/** "No período entrou R$ 9,4 mi, 102% do previsto; em set/2026, 96%". */
+export function respostaPrevistoRecebido(linhas: LinhaPrevistoRecebido[]): string {
+  const previsto = linhas.reduce((s, l) => s + l.previsto, 0)
+  const recebido = linhas.reduce((s, l) => s + l.recebido, 0)
+  if (previsto === 0) return recebido === 0 ? 'Nenhuma parcela vencia no período' : `No período entrou ${moedaCompacta(recebido)}, sem parcela prevista`
+  const ultimo = linhas.at(-1)!
+  const noUltimo = ultimo.previsto === 0 ? '' : `; em ${mes(ultimo.mes)}, ${pct(ultimo.recebido / ultimo.previsto, 0)}`
+  return `No período entrou ${moedaCompacta(recebido)}, ${pct(recebido / previsto, 0)} do previsto${noUltimo}`
+}
+
+export type LinhaFaixa = { faixa: string; ordem: number; saldo: number; parcelas: number }
+
+/** Um ícone por faixa, que enche com o atraso: a faixa nunca é só a cor (seção 6.3). */
+export const ICONES_DAS_FAIXAS = ['◔', '◑', '◕', '●']
+
+export function rotuloDaFaixa(faixa: string): string {
+  return `${faixa} dias`
+}
+
+/** "R$ 603 mil, 72% do atraso, está há mais de 90 dias". */
+export function respostaFaixas(linhas: LinhaFaixa[]): string {
+  const total = linhas.reduce((s, l) => s + l.saldo, 0)
+  if (total === 0) return 'Nenhuma parcela em atraso no fim do período'
+  const maior = linhas.reduce((a, b) => (b.saldo > a.saldo ? b : a))
+  const verbo = maior.ordem === 4 ? 'está há' : 'está entre'
+  return `${moedaCompacta(maior.saldo)}, ${pct(maior.saldo / total, 0)} do atraso, ${verbo} ${rotuloDaFaixa(maior.faixa)}; o total em atraso é ${moedaCompacta(total)}`
+}
+
+export type LinhaMapaCalor = { empreendimento_id: number; nome: string; faixa: string; ordem: number; saldo: number }
+
+export function respostaMapaCalor(linhas: LinhaMapaCalor[]): string {
+  const maior = linhas.reduce((a, b) => (b.saldo > a.saldo ? b : a))
+  if (maior.saldo === 0) return 'Nenhum empreendimento tem parcela em atraso no fim do período'
+  return `O dinheiro mais parado está no ${maior.nome}: ${moedaCompacta(maior.saldo)} em atraso de ${rotuloDaFaixa(maior.faixa)}`
+}
+
+export type LinhaInadEmpreendimento = { empreendimento_id: number; nome: string; inadimplencia: number }
+
+export function respostaInadEmpreendimento(linhas: LinhaInadEmpreendimento[]): string {
+  const ordem = [...linhas].sort((a, b) => b.inadimplencia - a.inadimplencia)
+  const [pior, ...outros] = ordem
+  if (outros.length === 0) return `No ${pior.nome}, ${pct(pior.inadimplencia)} do que venceu não foi pago`
+  const faixa = outros.length === 1
+    ? pct(outros[0].inadimplencia)
+    : `${pct(outros.at(-1)!.inadimplencia)} a ${pct(outros[0].inadimplencia)}`
+  return `No ${pior.nome}, ${pct(pior.inadimplencia)} do que venceu não foi pago; nos outros, ${faixa}`
+}
+
+export type LinhaInadDesconto = { faixa_desconto: string; ordem: number; vendas: number; inadimplencia: number | null }
+
+export function respostaInadDesconto(linhas: LinhaInadDesconto[]): string {
+  const comDados = linhas.filter((l) => l.inadimplencia !== null)
+  if (comDados.length === 0) return 'Sem parcela vencida neste filtro'
+  const pior = comDados.reduce((a, b) => (b.inadimplencia! > a.inadimplencia! ? b : a))
+  const baixo = linhas.find((l) => l.ordem === 1)
+  const contra = baixo && baixo !== pior && baixo.inadimplencia !== null ? `, contra ${pct(baixo.inadimplencia)} nas de até 3%` : ''
+  return `Nas vendas com desconto de ${pior.faixa_desconto}, ${pct(pior.inadimplencia!)} do vencido está em aberto${contra}`
+}
+
+export type LinhaDistratos = { distratos: number; com_atraso_60: number; pct: number | null }
+
+export function respostaDistratos([l]: LinhaDistratos[]): string {
+  if (!l || l.distratos === 0) return 'Nenhum distrato no período'
+  const depois = 'depois de uma parcela com mais de 60 dias de atraso'
+  if (l.distratos === 1) return l.com_atraso_60 === 1 ? `O único distrato do período veio ${depois}` : 'O único distrato do período não teve atraso acima de 60 dias antes'
+  if (l.com_atraso_60 === l.distratos) return `Os ${inteiro(l.distratos)} distratos do período vieram ${depois}`
+  return `${inteiro(l.com_atraso_60)} dos ${inteiro(l.distratos)} distratos do período (${pct(l.pct ?? 0, 0)}) vieram ${depois}`
 }

@@ -3,9 +3,9 @@ import { Cartao } from '../componentes/Cartao.tsx'
 import { Conclusoes } from '../componentes/Conclusoes.tsx'
 import { Kpi } from '../componentes/Kpi.tsx'
 import { inteiro, mes } from '../formatar.ts'
-import { paramsDaRota, periodoAnterior } from '../navegacao/rotas.ts'
+import { paramsDaRota } from '../navegacao/rotas.ts'
 import { PALETA } from '../tema/paleta.ts'
-import { KPIS, type MesDeVendas, respostaVendasMensais } from './respostas.ts'
+import { KPIS, type MesDeVendas, respostaVendasMensais, textoDaComparacao } from './respostas.ts'
 import css from './Telas.module.css'
 import type { PropsDaTela } from './tipos.ts'
 
@@ -13,8 +13,6 @@ const umaCasa = (v: number) => v.toFixed(1).replace('.', ',')
 
 export function VisaoGeral({ rota }: PropsDaTela) {
   const params = paramsDaRota(rota)
-  const anterior = periodoAnterior(rota)
-  const textoAnterior = anterior.de === anterior.ate ? mes(anterior.de) : `${mes(anterior.de)}–${mes(anterior.ate)}`
 
   return (
     <div className={css.tela}>
@@ -25,7 +23,7 @@ export function VisaoGeral({ rota }: PropsDaTela) {
       </figure>
 
       <section aria-label="Indicadores do período" className={css.kpis}>
-        {KPIS.map((k) => <Kpi key={k.id} kpi={k} params={params} periodoAnterior={textoAnterior} />)}
+        {KPIS.map((k) => <Kpi key={k.id} kpi={k} params={params} periodoAnterior={textoDaComparacao(k, rota)} />)}
       </section>
 
       <Cartao<MesDeVendas>

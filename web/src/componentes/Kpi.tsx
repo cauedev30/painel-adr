@@ -9,7 +9,7 @@ import { PainelSql } from './PainelSql.tsx'
 type Props = {
   kpi: DefinicaoKpi
   params: Param[]
-  /** O período da comparação, já escrito: "out/2024–set/2025". */
+  /** Contra o quê compara, já escrito: "out/2024–set/2025", "ago/2026", "fim de set/2025". */
   periodoAnterior: string
 }
 

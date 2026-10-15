@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { GLOSSARIO } from '../../src/glossario.ts'
 import {
   KPIS, type LinhaEmpreendimento, type LinhaRanking, canalQueMaisConverte, lerKpi, respostaCanais, respostaDistribuicao, respostaEmpreendimentos, respostaEstatisticas, respostaRitmo,
-  respostaFunil, respostaRanking, respostaVendasMensais, respostaVistaMar, variacaoDePosicao,
+  KPIS_RECEBIVEIS, respostaDistratos, textoDaComparacao, respostaFaixas, respostaFunil, respostaInadDesconto, respostaInadEmpreendimento,
+  respostaMapaCalor, respostaPrevistoRecebido, respostaRanking, respostaVendasMensais, respostaVistaMar, variacaoDePosicao,
 } from '../../src/telas/respostas.ts'
 import { abrirBanco, rodar } from '../apoio/banco.ts'
 
@@ -144,5 +145,66 @@ describe('frases de Funil e corretores', () => {
     expect(respostaRanking([r('Kaique Mendes', 1, 1, 12), r('Luísa Lopes', 3, 5), r('Luiza das Neves', 6, 14)]))
       .toBe('Kaique Mendes lidera com 12 vendas (R$ 1,0 mi); quem mais subiu foi Luiza das Neves, 8 posições')
     expect(respostaRanking([r('A', 1, null, 2), r('B', 1, null, 2)])).toBe('2 corretores dividem o 1º lugar, com 2 vendas cada')
+  })
+})
+
+describe('frases de Recebíveis', () => {
+  it('os 3 KPIs, com a inadimplência reusando a consulta da visão geral', () => {
+    expect(KPIS_RECEBIVEIS.map((k) => k.consulta)).toEqual(['recebiveis/kpi_a_receber_12m', 'recebiveis/kpi_recebido_mes', 'visao-geral/kpi_inadimplencia'])
+    expect(KPIS_RECEBIVEIS[1].comparacao).toBe('mes')
+  })
+
+  it('previsto × recebido: o total do período e o último mês', () => {
+    expect(respostaPrevistoRecebido([
+      { mes: '2026-08', previsto: 500_000, recebido: 600_000 },
+      { mes: '2026-09', previsto: 500_000, recebido: 480_000 },
+    ])).toBe('No período entrou R$ 1,1 mi, 108% do previsto; em set/2026, 96%')
+    expect(respostaPrevistoRecebido([{ mes: '2026-09', previsto: 0, recebido: 0 }])).toBe('Nenhuma parcela vencia no período')
+  })
+
+  it('faixas: a maior faixa e o total', () => {
+    const f = (faixa: string, ordem: number, saldo: number) => ({ faixa, ordem, saldo, parcelas: 1 })
+    expect(respostaFaixas([f('1–30', 1, 100_000), f('31–60', 2, 50_000), f('61–90', 3, 50_000), f('mais de 90', 4, 600_000)]))
+      .toBe('R$ 600 mil, 75% do atraso, está há mais de 90 dias; o total em atraso é R$ 800 mil')
+    expect(respostaFaixas([f('1–30', 1, 300), f('mais de 90', 4, 100)])).toBe('R$ 300, 75% do atraso, está entre 1–30 dias; o total em atraso é R$ 400')
+    expect(respostaFaixas([f('1–30', 1, 0)])).toBe('Nenhuma parcela em atraso no fim do período')
+  })
+
+  it('mapa de calor: a célula maior', () => {
+    expect(respostaMapaCalor([
+      { empreendimento_id: 1, nome: 'Mares A', faixa: 'mais de 90', ordem: 4, saldo: 116_000 },
+      { empreendimento_id: 2, nome: 'Mares B', faixa: 'mais de 90', ordem: 4, saldo: 418_000 },
+    ])).toBe('O dinheiro mais parado está no Mares B: R$ 418 mil em atraso de mais de 90 dias')
+  })
+
+  it('inadimplência por empreendimento e por desconto', () => {
+    const e = (nome: string, inadimplencia: number) => ({ empreendimento_id: 1, nome, inadimplencia })
+    expect(respostaInadEmpreendimento([e('Mares A', 0.0745), e('Mares B', 0.0305), e('Mares C', 0.0053)]))
+      .toBe('No Mares A, 7,5% do que venceu não foi pago; nos outros, 0,5% a 3,1%')
+    expect(respostaInadEmpreendimento([e('Mares A', 0.0745)])).toBe('No Mares A, 7,5% do que venceu não foi pago')
+    const d = (faixa_desconto: string, ordem: number, inadimplencia: number | null) => ({ faixa_desconto, ordem, vendas: 1, inadimplencia })
+    expect(respostaInadDesconto([d('0–3%', 1, 0.024), d('3–8%', 2, 0.0129), d('8% ou mais', 3, 0.0685)]))
+      .toBe('Nas vendas com desconto de 8% ou mais, 6,9% do vencido está em aberto, contra 2,4% nas de até 3%')
+    expect(respostaInadDesconto([d('0–3%', 1, null)])).toBe('Sem parcela vencida neste filtro')
+  })
+
+  it('distratos', () => {
+    expect(respostaDistratos([{ distratos: 0, com_atraso_60: 0, pct: null }])).toBe('Nenhum distrato no período')
+    expect(respostaDistratos([{ distratos: 4, com_atraso_60: 4, pct: 1 }])).toBe('Os 4 distratos do período vieram depois de uma parcela com mais de 60 dias de atraso')
+    expect(respostaDistratos([{ distratos: 4, com_atraso_60: 3, pct: 0.75 }])).toBe('3 dos 4 distratos do período (75%) vieram depois de uma parcela com mais de 60 dias de atraso')
+  })
+})
+
+describe('texto da comparação dos KPIs', () => {
+  const rota = { tela: 'visao-geral' as const, de: '2025-10', ate: '2026-09', emp: null, extra: {} }
+  const kpi = (id: string) => [...KPIS, ...KPIS_RECEBIVEIS].find((k) => k.id === id)!
+
+  it('período anterior, mês anterior e fim do período anterior', () => {
+    expect(textoDaComparacao(kpi('vgv'), rota)).toBe('out/2024–set/2025')
+    expect(textoDaComparacao(kpi('recebido_mes'), rota)).toBe('ago/2026')
+    expect(textoDaComparacao(kpi('estoque'), rota)).toBe('fim de set/2025')
+    expect(textoDaComparacao(kpi('inadimplencia'), rota)).toBe('fim de set/2025')
+    expect(textoDaComparacao(kpi('a_receber_12m'), rota)).toBe('fim de set/2025')
+    expect(textoDaComparacao(kpi('vgv'), { ...rota, de: '2026-09' })).toBe('ago/2026')
   })
 })
