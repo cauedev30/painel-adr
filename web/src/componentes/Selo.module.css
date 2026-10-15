@@ -19,3 +19,14 @@
 .selo a:hover {
   color: var(--cobre-forte);
 }
+
+.selo a.versao {
+  color: var(--texto-2);
+  font-family: ui-monospace, 'Cascadia Code', Consolas, monospace;
+  font-size: 0.75rem;
+  text-decoration: none;
+}
+
+.selo a.versao:hover {
+  color: var(--cobre-forte);
+}

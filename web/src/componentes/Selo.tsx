@@ -8,6 +8,9 @@ export function Selo() {
     <p className={css.selo}>
       <span>Projeto conceitual de candidatura · dados simulados</span>
       <a href={REPOSITORIO} target="_blank" rel="noopener noreferrer">por Cauê Franco</a>
+      <a className={css.versao} href={`${REPOSITORIO}/commit/${__VERSAO__}`} target="_blank" rel="noopener noreferrer">
+        versão {__VERSAO__.slice(0, 7)}
+      </a>
     </p>
   )
 }
