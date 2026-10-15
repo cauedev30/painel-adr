@@ -7,12 +7,11 @@
 """
 
 import difflib
-import json
 import re
 
 import pandas as pd
 
-from etl.tratar.comum import Registro, Resultado, normalizar_texto
+from etl.tratar.comum import Registro, Resultado, normalizar_texto, quarentenar
 
 # de-para do bairro: texto normalizado → nome oficial
 DICIONARIO_BAIRROS = {
@@ -99,11 +98,12 @@ def _corretores(df: pd.DataFrame, cadastro: pd.Series, origem: str, tabela: str)
     corrigidos = saida.loc[saida["corretor_id"].notna()
                            & saida["corretor_nome"].ne(saida["corretor_id"].map(cadastro)), "id"].tolist()
 
-    quarentena = [{"origem": origem, "regra": "R2", "motivo": motivos[p],
-                   "registro": json.loads(saida.loc[p].drop("corretor_id").to_json(date_format="iso"))}
-                  for p in motivos]
-    barrados = saida.loc[list(motivos), "id"].tolist()
-    saida = saida.drop(index=list(motivos)).drop(columns="corretor_nome").reset_index(drop=True)
+    barrar = pd.Series(saida.index.isin(list(motivos)), index=saida.index)
+    barrados = saida.loc[barrar, "id"].tolist()
+    # a quarentena guarda a linha como chegou, com o nome escrito
+    _, quarentena = quarentenar(saida.drop(columns="corretor_id"), barrar, tabela, "R2",
+                                lambda linha: motivos[linha.name])
+    saida = saida[~barrar].drop(columns="corretor_nome").reset_index(drop=True)
 
     registros = [Registro("R2", origem, f"Nome de corretor ({tabela}) casado com o cadastro",
                           len(corrigidos), "corrigido", corrigidos)]

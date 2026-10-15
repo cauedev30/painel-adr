@@ -46,14 +46,11 @@ def test_datas_e_valores_convertidos_batem_com_a_verdade(convertido, verdade, ga
         vazio = pd.Timestamp(0)
         assert (lead.loc[comuns, coluna].fillna(vazio) == certo.loc[comuns, coluna].fillna(vazio)).all(), coluna
 
-    pagamento = convertido.tabelas["pagamento"].set_index("id")
-    certo = verdade["pagamento"].set_index("id")
-    assert (pagamento["valor_pago"] == certo["valor_pago"]).all()
-    assert (pagamento["data_pagamento"] == certo["data_pagamento"]).all()
-
-    parcela = convertido.tabelas["parcela"].set_index("id")
-    certo = verdade["parcela"].set_index("id")
-    assert (parcela["valor"] == certo["valor"]).all()
+    for tabela, colunas in [("pagamento", ["valor_pago", "data_pagamento"]), ("parcela", ["valor"])]:
+        limpo = convertido.tabelas[tabela].set_index("id")
+        certo = verdade[tabela].set_index("id").loc[limpo.index]  # sem os que foram para a quarentena
+        for coluna in colunas:
+            assert (limpo[coluna] == certo[coluna]).all(), (tabela, coluna)
 
 
 def test_conversao_de_dinheiro_registrada_em_todas_as_linhas_do_erp(convertido, lidos):

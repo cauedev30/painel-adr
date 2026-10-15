@@ -7,7 +7,7 @@ As datas do .xlsx já chegam como data e não passam por aqui.
 
 import pandas as pd
 
-from etl.tratar.comum import Registro, Resultado
+from etl.tratar.comum import Registro, Resultado, quarentenar
 
 FORMATO_CRM = "%d/%m/%Y %H:%M"
 FORMATO_CRM_ALTERNATIVO = "%Y-%m-%d %H:%M:%S"
@@ -57,3 +57,35 @@ def converter(tabelas: dict[str, pd.DataFrame]) -> Resultado:
         if ids:
             registros.append(Registro("R4", origem, "Data que nenhum formato conhecido lê", len(ids), "nulo", ids))
     return Resultado(t, registros)
+
+
+ULTIMO_VENCIMENTO_POSSIVEL = pd.Timestamp("2035-12-31")
+
+
+def barrar_impossiveis(tabelas: dict[str, pd.DataFrame]) -> Resultado:
+    """Data que não tem como estar certa: parcela vencendo depois de 2035 e venda anterior à entrada do
+    lead do cliente no CRM. Não dá para saber a data certa, então a linha vai para a quarentena."""
+    t = dict(tabelas)
+
+    parcela = t["parcela"]
+    tarde_demais = parcela["vencimento"] > ULTIMO_VENCIMENTO_POSSIVEL
+    ids_parcela = parcela.loc[tarde_demais, "id"].tolist()
+    t["parcela"], quarentena = quarentenar(parcela, tarde_demais, "parcela", "R4",
+                                           lambda p: f"vencimento impossível: {p['vencimento']:%Y-%m-%d}")
+
+    venda = t["venda"]
+    entrada_do_lead = venda["cliente_id"].map(t["cliente"].set_index("id")["lead_id"]).map(
+        t["lead"].set_index("id")["data_entrada"])
+    antes = venda["data_venda"] < entrada_do_lead.dt.floor("D")
+    ids_venda = venda.loc[antes, "id"].tolist()
+    entrada = dict(zip(venda["id"], entrada_do_lead))
+    t["venda"], barradas = quarentenar(
+        venda, antes, "venda", "R4",
+        lambda v: f"venda em {v['data_venda']:%Y-%m-%d}, antes da entrada do lead em {entrada[v['id']]:%Y-%m-%d}")
+
+    return Resultado(t, [
+        Registro("R4", "erp_parcelas.csv", "Vencimento impossível (depois de 2035)", len(ids_parcela),
+                 "quarentena", ids_parcela),
+        Registro("R4", "comercial_espelho.xlsx", "Venda com data anterior à entrada do lead no CRM",
+                 len(ids_venda), "quarentena", ids_venda),
+    ], quarentena + barradas)
