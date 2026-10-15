@@ -1,0 +1,66 @@
+.tela {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--esp-5);
+  padding: var(--esp-5);
+  text-align: center;
+}
+
+.logo {
+  width: 160px;
+  height: auto;
+}
+
+.texto {
+  color: var(--texto-2);
+  max-width: 36ch;
+}
+
+/* barra indeterminada em cobre: o banco tem alguns megabytes para baixar e abrir */
+.barra {
+  width: 200px;
+  height: 2px;
+  background: var(--borda);
+  overflow: hidden;
+  border-radius: 2px;
+}
+
+.barra span {
+  display: block;
+  width: 40%;
+  height: 100%;
+  background: var(--cobre);
+  animation: andar 1.2s ease-in-out infinite;
+}
+
+@keyframes andar {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(250%);
+  }
+}
+
+.erro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--esp-4);
+}
+
+.botao {
+  background: var(--cobre);
+  color: var(--fundo);
+  border: 0;
+  border-radius: var(--raio-pequeno);
+  padding: var(--esp-2) var(--esp-4);
+  font-weight: 600;
+}
+
+.botao:hover {
+  background: var(--cobre-forte);
+}
