@@ -18,7 +18,7 @@ LARGURA_MAXIMA = 50
 
 FORMATO_DATA = "DD/MM/YYYY"
 FORMATO_DATA_HORA = "DD/MM/YYYY HH:MM"
-FORMATO_PORCENTAGEM = "0%"
+FORMATO_PONTOS_PERCENTUAIS = "0.00"  # a coluna "(%)" já vem em pontos: 3,26 é 3,26%
 
 
 def _formato(serie: pd.Series, titulo: str) -> str | None:
@@ -27,7 +27,7 @@ def _formato(serie: pd.Series, titulo: str) -> str | None:
         com_hora = (serie.dropna().dt.floor("D") != serie.dropna()).any()
         return FORMATO_DATA_HORA if com_hora else FORMATO_DATA
     if titulo.endswith("(%)"):
-        return FORMATO_PORCENTAGEM
+        return FORMATO_PONTOS_PERCENTUAIS
     return None
 
 

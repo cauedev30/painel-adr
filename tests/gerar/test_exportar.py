@@ -55,12 +55,12 @@ def test_xlsx_tem_as_abas_e_o_mesmo_conteudo(sujo, gravado):
         assert linhas[arquivo] == sum(len(df) for df in brutos[arquivo].values())
 
 
-def test_xlsx_mostra_data_e_porcentagem_no_formato_brasileiro(gravado):
+def test_xlsx_mostra_data_e_desconto_no_formato_brasileiro(gravado):
     pasta, _ = gravado
     espelho = openpyxl.load_workbook(pasta / "brutos" / sujeira.ESPELHO)
     assert espelho["Empreendimentos"]["F2"].number_format == "DD/MM/YYYY"  # Lançamento
     assert espelho["Vendas"]["J2"].number_format == "DD/MM/YYYY"  # Data da venda
-    assert espelho["Vendas"]["L2"].number_format == "0%"  # Desconto (%)
+    assert espelho["Vendas"]["L2"].number_format == "0.00"  # Desconto (%), já em pontos: 0,15 é 0,15%
     corretores = openpyxl.load_workbook(pasta / "brutos" / sujeira.PARCEIROS)["Corretores"]
     assert corretores["E2"].number_format == "DD/MM/YYYY"  # Início
 
