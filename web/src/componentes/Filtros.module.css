@@ -2,33 +2,102 @@
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
-  gap: var(--esp-3);
+  gap: var(--esp-4);
 }
 
-.filtros label {
-  display: flex;
-  flex-direction: column;
-  gap: var(--esp-1);
-  font-size: var(--tamanho-pequeno);
+.grupo {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+/* rótulo pequeno em Lexend Zetta, espaçado, como as legendas de uma peça impressa */
+.rotulo {
+  padding: 0;
+  margin-bottom: var(--esp-2);
+  font-family: var(--fonte-titulo);
+  font-size: 0.625rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
   color: var(--texto-2);
 }
 
-.filtros select {
-  min-width: 112px;
-  padding: var(--esp-2) var(--esp-3);
-  background: var(--superficie-2);
+/* a peça: borda fina, um brilho quase imperceptível no alto e o cobre no hover */
+.caixa {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  padding: 0 var(--esp-1);
+  background: linear-gradient(180deg, #1d1d1d 0%, var(--superficie) 100%);
   border: 1px solid var(--borda);
   border-radius: var(--raio-pequeno);
-  color: var(--texto);
-  font-size: var(--tamanho-texto);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.04), 0 1px 2px rgb(0 0 0 / 0.4);
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.filtros select:hover {
-  border-color: var(--texto-2);
+.caixa:hover {
+  border-color: color-mix(in srgb, var(--cobre) 55%, var(--borda));
+}
+
+.caixa:focus-within {
+  border-color: var(--cobre);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.04), 0 0 0 3px color-mix(in srgb, var(--cobre) 18%, transparent);
+}
+
+.seletor {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.seletor select {
+  appearance: none;
+  height: 38px;
+  padding: 0 calc(var(--esp-3) + 18px) 0 var(--esp-3);
+  background: transparent;
+  border: 0;
+  color: var(--texto);
+  font-size: var(--tamanho-texto);
+  letter-spacing: 0.02em;
+  cursor: pointer;
+}
+
+/* o foco já aparece na peça inteira (focus-within) */
+.seletor select:focus-visible {
+  outline: none;
+}
+
+.seletor select option {
+  background: var(--superficie-2);
+  color: var(--texto);
+}
+
+.seletor svg {
+  position: absolute;
+  right: var(--esp-2);
+  color: var(--cobre);
+  pointer-events: none;
+  transition: transform 0.2s;
+}
+
+.seletor:hover svg {
+  transform: translateY(1px);
+}
+
+.traco {
+  color: var(--cobre);
+  opacity: 0.7;
+  padding: 0 var(--esp-1);
+}
+
+.empreendimento .seletor,
+.empreendimento select {
+  width: 100%;
 }
 
 .empreendimento select {
-  min-width: 200px;
+  min-width: 196px;
 }
 
 @media (max-width: 899px) {
@@ -36,17 +105,16 @@
     width: 100%;
   }
 
-  .filtros label {
-    flex: 1 1 120px;
+  .grupo {
+    flex: 1 1 100%;
   }
 
-  .filtros select,
-  .empreendimento select {
+  .caixa .seletor {
+    flex: 1;
+  }
+
+  .caixa select {
     width: 100%;
     min-width: 0;
-  }
-
-  .empreendimento {
-    flex-basis: 100%;
   }
 }
