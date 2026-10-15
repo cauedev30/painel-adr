@@ -4,52 +4,343 @@
 > Empreendimentos. Os nomes e fatos públicos dos empreendimentos vêm do site da empresa; todos os
 > números são simulados.
 
-Painel de dados **comercial e de recebíveis** pensado para a ADR Empreendimentos, construtora de
-compactos de alto padrão em João Pessoa (PB). Ele mostra o que um analista de dados faria lá dentro
-para a diretoria: juntar o que vem do CRM, da planilha do comercial e do ERP financeiro, tratar e
-validar esses dados num banco PostgreSQL e transformar tudo em respostas claras.
+Painel comercial e de recebíveis pensado para a ADR Empreendimentos, construtora de compactos de alto
+padrão em João Pessoa (PB), que vende na planta, parcelado, por corretores parceiros. Ele responde às
+três perguntas que definem a saúde desse negócio: **o lançamento está vendendo no ritmo certo? De onde
+vêm os compradores? O dinheiro das parcelas está entrando?**
 
-**Status:** em construção. O desenho completo está em [`docs/spec.md`](docs/spec.md).
+Para responder, junta o que vem de três sistemas que não conversam (CRM, planilha do comercial e ERP
+financeiro), trata e valida esses dados em Python, guarda tudo num banco PostgreSQL e mostra as
+respostas num painel em que todo número leva ao SQL que o produziu.
 
-## Do dado à resposta
+**Site:** https://cauedev30.github.io/painel-adr/ (o banco roda no navegador; não há nada para instalar)
 
-```mermaid
-flowchart TD
-  SIM["No projeto, os 3 sistemas são simulados<br/>gerar_dados.py cria a verdade e suja do jeito de cada um"]
+![Visão geral do painel](docs/img/visao-geral-1440.png)
 
-  subgraph ORIGEM["① ONDE O DADO NASCE · 3 sistemas que não conversam"]
-    direction LR
-    CRM["CRM<br/>leads do site, WhatsApp<br/>e Instagram"] ~~~ PLAN["Planilha do comercial<br/>vendas e corretores"] ~~~ ERP["ERP financeiro<br/>parcelas e pagamentos"]
-  end
+## Arquitetura
 
-  subgraph PIPE["② PIPELINE · python pipeline.py · PREPARA"]
-    direction LR
-    LER["1 · Ler<br/>cada arquivo vira<br/>um DataFrame"] --> TRATAR["2 · Tratar<br/>padroniza e junta"] --> VALIDAR["3 · Validar<br/>confere; se falhar, para"] --> CARREGAR["4 · Carregar<br/>no banco"]
-  end
-
-  subgraph BANCO["③ BANCO POSTGRESQL · GUARDA E RESPONDE VIA SQL"]
-    direction LR
-    TAB["10 tabelas limpas"] ~~~ AUD["Relatório de qualidade<br/>e quarentena"]
-  end
-
-  subgraph PAINEL["④ PAINEL · MOSTRA"]
-    direction LR
-    TELAS["6 telas<br/>com os KPIs"] ~~~ VERSQL["Ver SQL<br/>a consulta de cada gráfico"] ~~~ CONSOLE["Console SQL<br/>para testar ao vivo"]
-  end
-
-  DIR(["DIRETORIA · pergunta → resposta → decisão"])
-
-  SIM -.-> ORIGEM
-  ORIGEM -- "exports bagunçados" --> PIPE
-  PIPE -- "dados confiáveis" --> BANCO
-  BANCO -- "consultas SQL" --> PAINEL
-  PAINEL -- "insights" --> DIR
 ```
+                ┌────────────────────────────────────────────────┐
+                │ gerar_dados.py                                 │
+                │ simula os sistemas, com semente e gabarito     │
+                └───────────────────────┬────────────────────────┘
+                                        │ cada sistema exporta do seu jeito
+         ┌──────────────────┬───────────┴─────────┬────────────────────┐
+         ▼                  ▼                     ▼                    ▼
+ ┌───────────────┐ ┌─────────────────┐ ┌─────────────────────┐ ┌───────────────┐
+ │ CRM           │ │ Planilha do     │ │ ERP financeiro      │ │ Diretoria     │
+ │ leads         │ │ comercial       │ │ parcelas e baixas   │ │ metas         │
+ │ .csv UTF-8    │ │ vendas, .xlsx   │ │ .csv Latin-1        │ │ .xlsx         │
+ └───────┬───────┘ └────────┬────────┘ └──────────┬──────────┘ └───────┬───────┘
+         └──────────────────┴───────────┬─────────┴────────────────────┘
+                                        │ 6 arquivos brutos (dados/brutos/)
+                                        ▼
+                ┌────────────────────────────────────────────────┐
+                │ pipeline.py · Python e Pandas                  │
+                │ ler → tratar (R1 a R7) → validar → carregar    │
+                └───────────────────────┬────────────────────────┘
+                                        │ tabelas limpas, relatório e quarentena
+                                        ▼
+                ┌────────────────────────────────────────────────┐
+                │ PostgreSQL (PGlite)                            │
+                │ schemas adr e auditoria, salvo em banco.tar.gz │
+                └───────────────────────┬────────────────────────┘
+                                        │ 30 consultas SQL (sql/consultas/)
+                                        ▼
+                ┌────────────────────────────────────────────────┐
+                │ Painel · React e ECharts, no GitHub Pages      │
+                │ o banco abre no navegador, num Web Worker      │
+                └────────────────────────────────────────────────┘
+```
+
+Não há servidor: o pipeline monta o banco uma vez, e o navegador de quem abre o site baixa esse banco e
+roda as consultas localmente. Cada visitante tem a própria cópia, então o console SQL pode até apagar
+tabelas sem afetar ninguém.
 
 ## Stack
 
-Python (Pandas, NumPy, Matplotlib) · PostgreSQL rodando no navegador com PGlite · React, Vite e
-TypeScript · ECharts · publicação automática no GitHub Pages.
+### Dados
+- Python 3.12, Pandas 3.0 e NumPy 2.5 no pipeline e na geração dos dados
+- Faker (pt-BR) para nomes, telefones e e-mails com cara de dado brasileiro
+- Matplotlib e Jupyter no [notebook do pipeline](notebooks/tour-do-pipeline.ipynb)
+- pytest: cada regra de tratamento é testada contra o gabarito que a geração grava
+
+### Banco
+- PostgreSQL rodando em WebAssembly pelo PGlite 0.5.9: o mesmo banco no build (Node) e no navegador
+- SQL puro, que roda em qualquer Postgres (psql, pgAdmin, DBeaver)
+- `comment on` em toda tabela e coluna: é o dicionário de dados que a tela Dados mostra
+
+### Painel
+- React 19, TypeScript 6 e Vite 8
+- ECharts 6 nos gráficos (boxplot, funil, mapa de calor), com um destaque em cobre e o resto em cinza
+- CodeMirror 6 no console SQL e Mermaid 12 no DER da tela Dados
+- Vitest 5: cada consulta roda no banco gerado e precisa respeitar invariantes (o funil é decrescente,
+  as faixas de atraso somam o vencido em aberto, cada conclusão do painel é verdadeira nos dados)
+
+### Publicação
+- GitHub Actions: gera os dados, roda o pipeline e todos os testes e só então publica
+- GitHub Pages, com navegação por hash (qualquer tela recarrega sem 404)
+
+## Banco de dados
+
+10 tabelas no schema `adr` e 2 no schema `auditoria`, em [`sql/01_schema.sql`](sql/01_schema.sql). O
+diagrama mostra as chaves; o DER completo, com todas as colunas e o dicionário, está na tela Dados do
+painel.
+
+```mermaid
+erDiagram
+  empreendimento ||--o{ unidade : "tem"
+  empreendimento ||--o{ meta_mensal : "tem meta"
+  empreendimento ||--o{ lead : "atrai"
+  imobiliaria |o--o{ corretor : "reúne"
+  corretor |o--o{ lead : "atende"
+  lead ||--o| cliente : "vira"
+  cliente ||--o{ venda : "compra"
+  unidade ||--o{ venda : "é vendida em"
+  corretor ||--o{ venda : "vende"
+  venda ||--o{ parcela : "gera"
+  parcela ||--o{ pagamento : "recebe"
+
+  empreendimento {
+    smallint id PK
+    text nome
+    text status
+  }
+  unidade {
+    int id PK
+    smallint empreendimento_id FK
+    text tipologia
+    numeric area_privativa_m2
+    boolean vista_mar
+  }
+  imobiliaria {
+    smallint id PK
+    text nome
+  }
+  corretor {
+    smallint id PK
+    smallint imobiliaria_id FK
+    text nome
+  }
+  lead {
+    int id PK
+    smallint empreendimento_id FK
+    smallint corretor_id FK
+    text canal
+    text etapa
+  }
+  cliente {
+    int id PK
+    int lead_id FK
+    text perfil
+  }
+  venda {
+    int id PK
+    int unidade_id FK
+    int cliente_id FK
+    smallint corretor_id FK
+    numeric valor_venda
+    text status
+  }
+  parcela {
+    int id PK
+    int venda_id FK
+    date vencimento
+    numeric valor
+  }
+  pagamento {
+    int id PK
+    int parcela_id FK
+    numeric valor_pago
+  }
+  meta_mensal {
+    smallint empreendimento_id PK, FK
+    date mes PK
+    smallint meta_unidades
+  }
+```
+
+| Tabela | Para que serve |
+|---|---|
+| `empreendimento` | Os 7 empreendimentos reais da ADR, com bairro e status do site |
+| `unidade` | As 390 unidades dos 4 lançados: tipologia, área, vista mar e preço de tabela |
+| `imobiliaria` | Imobiliárias parceiras |
+| `corretor` | Corretores; o id 1 é "Venda direta" (a ADR vendeu sem corretor) |
+| `lead` | Leads do CRM, já sem duplicatas: canal, corretor, datas e etapa do funil |
+| `cliente` | O lead que comprou; um lead vira no máximo um cliente |
+| `venda` | Contratos; o distratado continua aqui, com status e data do distrato |
+| `parcela` | O plano de pagamento de cada venda (sinal, mensais, balões e chaves) |
+| `pagamento` | Baixas do ERP; uma parcela pode ter zero, um ou vários pagamentos (parciais) |
+| `meta_mensal` | Meta de unidades por empreendimento e mês, da planilha da diretoria |
+| `auditoria.relatorio_qualidade` | O que cada regra do pipeline tratou, e quantas linhas |
+| `auditoria.quarentena` | As linhas barradas, inteiras (em `jsonb`), com a regra e o motivo |
+
+Decisões de modelagem:
+- O status da unidade (disponível ou vendida) não é guardado: sai da venda ativa. Assim não existem dois
+  lugares dizendo coisas diferentes
+- Uma unidade só pode ter uma venda ativa, garantido por um índice único parcial
+  (`unique (unidade_id) where status = 'ativa'`)
+- O distrato não apaga a venda: muda o status e preenche a data, e uma `check` garante que uma coisa
+  não existe sem a outra
+- Dinheiro em `numeric(12, 2)`, nunca em ponto flutuante; telefone em E.164, conferido por expressão
+  regular na própria tabela
+- A qualidade dos dados também é consultável por SQL: o schema `auditoria` guarda o relatório e a
+  quarentena, e nada some em silêncio
+- Duas views fazem as junções que quase toda consulta precisa: `adr.vw_venda` (venda com unidade,
+  empreendimento, corretor e preço/m²) e `adr.vw_carteira` (parcela com saldo em aberto, dias de atraso
+  e faixa)
+
+![Tela Dados: o DER gerado do catálogo do banco](docs/img/dados-1440.png)
+
+## Pipeline
+
+### As fontes e a sujeira
+
+| Arquivo | Sistema | Formato | A sujeira |
+|---|---|---|---|
+| `crm_leads.csv` | CRM | `;`, UTF-8, datas `dd/mm/aaaa hh:mm` | leads duplicados, telefone em vários formatos, canal digitado à mão, nome de corretor abreviado, um lote com datas em outro formato, e-mail inválido |
+| `comercial_espelho.xlsx` | Planilha do comercial | unidades, vendas e distratos digitados à mão | bairro e nome de corretor escritos de vários jeitos, venda sem corretor, valor com um dígito a mais ou a menos, venda antes do lead |
+| `comercial_parceiros.xlsx` | Planilha do comercial | corretores e imobiliárias | é o cadastro oficial contra o qual os nomes são casados |
+| `erp_parcelas.csv` | ERP financeiro | Latin-1, valor como texto `R$ 1.234,56` | vencimento impossível (2099) |
+| `erp_baixas.csv` | ERP financeiro | o mesmo formato | pagamento de parcela que não existe |
+| `diretoria_metas.xlsx` | Diretoria | um mês por coluna | vem larga e precisa virar uma linha por mês |
+
+### O caminho do dado
+
+```
+┌────────────────────────────────┐
+│ 1 · ler                        │
+│ 6 arquivos viram 10 tabelas    │
+└────────────────────────────────┘
+       │ valores do jeito que chegaram
+       ▼
+┌────────────────────────────────┐            ┌──────────────────────────────┐
+│ 2 · tratar                     │ ─ barra ─▶ │ quarentena                   │
+│ R1 a R7 e a cascata            │            │ a linha inteira e o motivo   │
+└────────────────────────────────┘            └──────────────────────────────┘
+       │ tabelas tratadas e o relatório
+       ▼
+╭────────────────────────────────╮            ┌──────────────────────────────┐
+│ 3 · passa nas 10 checagens?    │ ── não ──▶ │ para e não grava nada        │
+╰────────────────────────────────╯            └──────────────────────────────┘
+       │ sim
+       ▼
+┌────────────────────────────────┐
+│ 4 · carregar                   │
+│ CSVs limpos e banco.tar.gz     │
+└────────────────────────────────┘
+```
+
+### As regras
+
+| Regra | Problema | Tratamento | Nesta base |
+|---|---|---|---|
+| R1 | A mesma pessoa entrou duas vezes no CRM | telefone padronizado em E.164; mesmo telefone ou e-mail é a mesma pessoa; fica o lead mais antigo, com o andamento mais avançado | 634 leads mesclados |
+| R2 | Bairro e nome de corretor escritos de vários jeitos | de-para de bairros; nome casado com o cadastro (igual, inicial + sobrenome, parecido); ambíguo vai para a quarentena | 3 bairros e 243 nomes casados, 3 nomes ambíguos |
+| R3 | Canal digitado à mão ("insta", "IG", "Zap") | dicionário de sinônimos; o que ele não conhece vira `outro` e é relatado | 29 jeitos de escrever viram 8 canais |
+| R4 | Datas em dois formatos e datas impossíveis | lê os dois formatos; vencimento depois de 2035 ou venda antes do lead vão para a quarentena | 792 datas no outro formato, 6 barradas |
+| R5 | Dinheiro em texto e valor digitado com um dígito a mais ou a menos | converte para número; cerca de 3 × IQR do preço/m² por empreendimento; se ÷ 10 volta para a faixa, corrige; senão, quarentena | 3 vendas corrigidas, 1 barrada |
+| R6 | Campo vazio ou inválido | venda sem corretor vira "Venda direta"; e-mail inválido vira nulo | 20 vendas, 285 e-mails |
+| R7 | Pagamento de parcela que não existe | quarentena, nunca apagado em silêncio | 6 pagamentos |
+
+O que depende de uma linha barrada vai junto (a venda leva as parcelas, a parcela leva os pagamentos),
+para o banco não ficar com filho sem pai. Ao todo, 147 linhas vão para a quarentena, e 131 delas por
+essa cascata. A quarentena bate, id por id, com o gabarito que a geração gravou.
+
+O [notebook do pipeline](notebooks/tour-do-pipeline.ipynb) percorre cada regra com o antes, o depois e
+um gráfico, chamando as mesmas funções de `etl/`:
+
+![Gráfico do notebook: o preço por m² de cada venda e a cerca de outliers](docs/img/notebook-preco-m2.png)
+
+## Painel
+
+| Tela | A pergunta | O que tem |
+|---|---|---|
+| Visão geral | Como está a ADR, numa tela só? | 6 KPIs com a variação contra o período anterior, vendas mensais × meta e "O que os dados dizem", com as conclusões e o link para o gráfico que comprova cada uma |
+| Vendas e estoque | O lançamento está vendendo no ritmo certo? | cartão por empreendimento (vendido × estoque, VSO), ritmo de vendas desde o lançamento, boxplot do preço/m² e estatística descritiva |
+| Funil e corretores | De onde vêm os compradores? | funil com a conversão entre etapas, leads e conversão por canal, ranking de corretores |
+| Recebíveis | O dinheiro das parcelas está entrando? | previsto × recebido, saldo por faixa de atraso, mapa de calor empreendimento × faixa |
+| Dados | Dá para confiar nesses números? | DER gerado do catálogo do banco, dicionário de dados e o relatório de qualidade |
+| Console SQL | E se eu quiser perguntar outra coisa? | editor com exemplos prontos, a lista de tabelas e o botão "Restaurar banco" |
+
+Todo gráfico tem **Ver SQL**, que mostra o mesmo arquivo `.sql` que ele executa, com os parâmetros do
+filtro, e **abrir no console**, que roda a consulta lá. Período e empreendimento filtram a tela inteira.
+
+| | |
+|---|---|
+| ![Vendas e estoque](docs/img/vendas-estoque-1440.png) | ![Funil e corretores](docs/img/funil-corretores-1440.png) |
+| ![Recebíveis](docs/img/recebiveis-1440.png) | ![Console SQL](docs/img/console-1440.png) |
+
+## Consultas SQL
+
+30 consultas em [`sql/consultas/`](sql/consultas), uma por cartão, todas com os mesmos parâmetros: `$1`
+início do período, `$2` fim do período e `$3` empreendimento (nulo = todos).
+
+| Tela | Consultas | Um exemplo | Arquivo |
+|---|---|---|---|
+| Visão geral | 7 | Quantas unidades a ADR vendeu a cada mês, e isso bateu a meta? | [`vendas_mensais.sql`](sql/consultas/visao-geral/vendas_mensais.sql) |
+| Vendas e estoque | 5 | A vista para o mar faz a unidade valer mais e vender mais rápido? | [`vista_mar.sql`](sql/consultas/vendas-estoque/vista_mar.sql) |
+| Funil e corretores | 3 | Quem são os corretores que mais vendem, e quem subiu ou caiu no ranking? | [`ranking_corretores.sql`](sql/consultas/funil-corretores/ranking_corretores.sql) |
+| Recebíveis | 8 | O distrato costuma vir depois de um atraso longo? | [`distratos_e_atraso.sql`](sql/consultas/recebiveis/distratos_e_atraso.sql) |
+| Dados | 2 | Que tabelas e colunas o banco tem, e como elas se ligam? | [`der.sql`](sql/consultas/dados/der.sql) |
+| Console SQL | 5 | Como as vendas mensais evoluíram desde o primeiro lançamento, sem o sobe e desce? | [`04_media_movel_vendas.sql`](sql/consultas/console/04_media_movel_vendas.sql) |
+
+O conjunto usa de propósito CTEs, `rank()`, `lag()`, `sum() over` (acumulado), `avg() over` (média
+móvel), `percentile_cont() within group`, `mode()`, `stddev_samp`, `count(*) filter`, `date_trunc`,
+`generate_series` (o mês sem venda aparece com zero) e consulta ao catálogo (`information_schema`).
+
+## Como rodar
+
+Precisa de Python 3.12 e Node 24.
+
+```bash
+pip install -r requirements.txt
+cd web && npm ci && cd ..   # o pipeline monta o banco com o PGlite, que roda no Node
+python gerar_dados.py       # simula os sistemas e grava os brutos e o gabarito
+python pipeline.py          # ler → tratar → validar → carregar
+cd web && npm run dev       # o painel em http://localhost:5173/painel-adr/
+```
+
+Testes:
+
+```bash
+python -m pytest            # pipeline e geração
+(cd web && npm test)        # as consultas no banco gerado e o painel
+jupyter nbconvert --to notebook --execute --inplace \
+  --ExecutePreprocessor.record_timing=False notebooks/tour-do-pipeline.ipynb   # o notebook, do zero
+```
+
+## Real × simulado
+
+| Real (site da ADR, conferido em 13/10/2026) | Simulado (semente fixa) |
+|---|---|
+| Os 7 empreendimentos: nome, bairro, status, previsão de entrega e faixa de área | Unidades, preços, leads, vendas, parcelas e pagamentos |
+| As tipologias (studio, duplex, garden) e a venda por corretores parceiros | Corretores, imobiliárias e clientes, com nomes inventados |
+| Logo, fotos e a identidade visual | Toda a sujeira dos arquivos brutos, com gabarito |
+
+Para a análise ter o que mostrar, a geração **plantou 5 padrões** nos dados:
+
+1. O canal que traz mais leads não é o que mais converte em venda
+2. As vendas se concentram nos melhores corretores
+3. A vista para o mar dá prêmio de preço e de velocidade de venda
+4. A inadimplência se concentra num empreendimento e nas vendas com desconto alto
+5. O distrato costuma vir depois de um atraso de mais de 60 dias
+
+As conclusões do painel são verdadeiras nestes dados porque esses padrões foram plantados. Numa base
+real, a análise é que descobriria esses padrões.
+
+## Próximos passos
+
+- [x] Dados simulados com semente fixa e gabarito da sujeira
+- [x] Pipeline ler → tratar → validar → carregar, testado contra o gabarito
+- [x] Banco PostgreSQL com DER, views e 30 consultas
+- [x] Painel com 6 telas, "Ver SQL" e console
+- [x] Notebook do pipeline
+- [ ] Publicação automática no GitHub Pages
+- [ ] Relatório mensal em Excel para a diretoria
+- [ ] Versão do painel em Power BI, com as medidas em DAX
+
+O desenho completo, com todas as decisões, está em [`docs/spec.md`](docs/spec.md).
 
 ---
 
