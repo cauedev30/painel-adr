@@ -8,7 +8,7 @@ from collections.abc import Callable
 
 import pandas as pd
 
-from etl.tratar import r1_duplicatas, r2_textos, r4_datas, r5_valores, r6_vazios
+from etl.tratar import r1_duplicatas, r2_textos, r3_canais, r4_datas, r5_valores, r6_vazios
 from etl.tratar.comum import Resultado
 
 Regra = Callable[[dict[str, pd.DataFrame]], Resultado]
@@ -19,6 +19,7 @@ REGRAS: list[Regra] = [
     r1_duplicatas.tratar,
     r6_vazios.tratar,
     r2_textos.tratar,
+    r3_canais.tratar,
 ]
 
 
