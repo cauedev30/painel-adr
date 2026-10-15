@@ -1,0 +1,49 @@
+/* Tokens visuais do painel. As cores repetem web/src/tema/paleta.ts, que é a fonte única; o teste
+   web/testes/painel/paleta.test.ts confere que os dois não se separam. */
+
+:root {
+  color-scheme: dark;
+
+  /* superfícies e texto */
+  --fundo: #0a0a0a;
+  --superficie: #171717;
+  --superficie-2: #222222;
+  --borda: #333333;
+  --texto: #f2f2f2;
+  --texto-2: #a6a6a6;
+
+  /* gráficos: um destaque em cobre, o resto em cinza */
+  --cinza: #666666;
+  --cobre: #cc8040;
+  --cobre-forte: #e09a58;
+
+  /* só em seleção e foco */
+  --dourado: #e6b85c;
+
+  /* faixas de atraso, do mais claro (1–30 dias) ao mais intenso (mais de 90) */
+  --atraso-1: #f4b2a6;
+  --atraso-2: #ec7f6d;
+  --atraso-3: #e0503d;
+  --atraso-4: #c42a1e;
+
+  /* tipografia */
+  --fonte-titulo: 'Lexend Zetta', 'Lexend Deca', sans-serif;
+  --fonte-texto: 'Lexend Deca', system-ui, sans-serif;
+  --tamanho-pequeno: 0.8125rem;
+  --tamanho-texto: 0.9375rem;
+  --tamanho-subtitulo: 1.125rem;
+  --tamanho-numero: 2rem;
+
+  /* espaçamentos, raios e medidas da estrutura */
+  --esp-1: 4px;
+  --esp-2: 8px;
+  --esp-3: 12px;
+  --esp-4: 16px;
+  --esp-5: 24px;
+  --esp-6: 32px;
+  --esp-7: 48px;
+  --raio: 8px;
+  --raio-pequeno: 4px;
+  --largura-barra: 248px;
+  --sombra: 0 8px 32px rgb(0 0 0 / 0.5);
+}

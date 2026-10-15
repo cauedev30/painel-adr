@@ -11,6 +11,9 @@
   },
   "dependencies": {
     "@electric-sql/pglite": "0.5.9",
+    "@fontsource/lexend-deca": "5.3.0",
+    "@fontsource/lexend-zetta": "5.3.0",
+    "echarts": "6.1.0",
     "react": "19.3.0",
     "react-dom": "19.3.0"
   },
