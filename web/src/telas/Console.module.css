@@ -1,0 +1,261 @@
+.console {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: var(--esp-5);
+  align-items: start;
+}
+
+.principal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-4);
+  min-width: 0;
+}
+
+.avisoCelular {
+  display: none;
+}
+
+.carregando,
+.dica {
+  color: var(--texto-2);
+  font-size: var(--tamanho-pequeno);
+}
+
+.parametros {
+  margin: 0;
+  padding: var(--esp-3) var(--esp-4);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-3);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+}
+
+.parametros legend {
+  padding: 0 var(--esp-1);
+  font-size: var(--tamanho-pequeno);
+  color: var(--texto-2);
+}
+
+.parametros label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-1);
+  font-size: var(--tamanho-pequeno);
+  color: var(--texto-2);
+}
+
+.parametros input {
+  width: 150px;
+  padding: var(--esp-2) var(--esp-3);
+  background: var(--fundo);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-pequeno);
+  color: var(--texto);
+  font-family: ui-monospace, 'Cascadia Code', Consolas, monospace;
+}
+
+.botoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--esp-3);
+}
+
+.executar,
+.restaurar {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--esp-1);
+  padding: var(--esp-2) var(--esp-4);
+  border-radius: var(--raio-pequeno);
+  font-weight: 600;
+}
+
+.executar {
+  background: var(--cobre);
+  border: 1px solid var(--cobre);
+  color: var(--fundo);
+}
+
+.executar:hover {
+  background: var(--cobre-forte);
+}
+
+.executar kbd {
+  font: inherit;
+  font-weight: 400;
+  font-size: 0.75rem;
+}
+
+.restaurar {
+  background: none;
+  border: 1px solid var(--borda);
+  color: var(--texto);
+}
+
+.restaurar:hover {
+  border-color: var(--cobre);
+}
+
+.executar:disabled,
+.restaurar:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.statusRestauro {
+  font-size: var(--tamanho-pequeno);
+  color: var(--texto-2);
+}
+
+.erro {
+  padding: var(--esp-3) var(--esp-4);
+  border: 1px solid var(--ruim);
+  border-radius: var(--raio);
+  background: color-mix(in srgb, var(--ruim) 10%, var(--superficie));
+  font-family: ui-monospace, 'Cascadia Code', Consolas, monospace;
+  font-size: var(--tamanho-pequeno);
+  white-space: pre-wrap;
+}
+
+.resultado {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-2);
+}
+
+.resumo {
+  font-size: var(--tamanho-pequeno);
+  color: var(--texto-2);
+}
+
+.resumo code {
+  color: var(--cobre-forte);
+}
+
+.rolagem {
+  max-height: 480px;
+  overflow: auto;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+}
+
+.tabela {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: ui-monospace, 'Cascadia Code', Consolas, monospace;
+  font-size: 0.8125rem;
+}
+
+.tabela th,
+.tabela td {
+  padding: var(--esp-1) var(--esp-3);
+  border-bottom: 1px solid var(--borda);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.tabela th {
+  position: sticky;
+  top: 0;
+  background: var(--superficie);
+  color: var(--texto-2);
+  font-weight: 400;
+}
+
+.tabela .numero {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.tabela .nulo {
+  color: var(--texto-2);
+  font-style: italic;
+}
+
+.lateral {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-5);
+  padding: var(--esp-4);
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+}
+
+.tituloLateral {
+  margin-bottom: var(--esp-3);
+  font-size: var(--tamanho-pequeno);
+}
+
+.exemplos,
+.tabelas,
+.tabelas ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.exemplos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-2);
+}
+
+.exemplos button {
+  width: 100%;
+  padding: var(--esp-2) var(--esp-3);
+  background: var(--superficie-2);
+  border: 1px solid transparent;
+  border-radius: var(--raio-pequeno);
+  color: var(--texto);
+  font-size: var(--tamanho-pequeno);
+  text-align: left;
+}
+
+.exemplos button:hover {
+  border-color: var(--cobre);
+}
+
+.tabelas {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-1);
+  font-size: var(--tamanho-pequeno);
+}
+
+.tabelas summary {
+  cursor: pointer;
+  padding: 2px 0;
+}
+
+.tabelas code {
+  color: var(--texto);
+}
+
+.tabelas ul {
+  padding: var(--esp-1) 0 var(--esp-2) var(--esp-4);
+}
+
+.tabelas ul span {
+  color: var(--texto-2);
+}
+
+@media (max-width: 1099px) {
+  .console {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 899px) {
+  .avisoCelular {
+    display: block;
+    grid-column: 1 / -1;
+    padding: var(--esp-3) var(--esp-4);
+    border: 1px solid var(--cobre);
+    border-radius: var(--raio);
+    font-size: var(--tamanho-pequeno);
+  }
+}

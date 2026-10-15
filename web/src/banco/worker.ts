@@ -6,8 +6,9 @@ import { worker } from '@electric-sql/pglite/worker'
 /** Mensagem que o cliente escuta para não esperar para sempre um banco que não vai abrir. */
 export type ErroDoBanco = { type: 'erro-do-banco'; mensagem: string }
 
-async function abrir(): Promise<PGlite> {
-  const resposta = await fetch(`${import.meta.env.BASE_URL}banco.tar.gz`)
+async function abrir(restaurar: boolean): Promise<PGlite> {
+  // ao restaurar (D6.6), o arquivo vem do cache do navegador: o mesmo da abertura, sem baixar de novo
+  const resposta = await fetch(`${import.meta.env.BASE_URL}banco.tar.gz`, { cache: restaurar ? 'force-cache' : 'default' })
   if (!resposta.ok) throw new Error(`não consegui baixar o banco.tar.gz (HTTP ${resposta.status})`)
   // sem o tipo do arquivo: o PGlite descobre se ainda está em gzip ou se o servidor já descompactou
   const banco = new Blob([await resposta.arrayBuffer()])
@@ -15,9 +16,9 @@ async function abrir(): Promise<PGlite> {
 }
 
 worker({
-  async init() {
+  async init(opcoes) {
     try {
-      return await abrir()
+      return await abrir(Boolean((opcoes.meta as { restaurar?: boolean } | undefined)?.restaurar))
     } catch (erro) {
       const mensagem: ErroDoBanco = { type: 'erro-do-banco', mensagem: erro instanceof Error ? erro.message : String(erro) }
       postMessage(mensagem)
