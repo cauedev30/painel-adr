@@ -1,12 +1,10 @@
-import { existsSync, readFileSync } from 'node:fs'
+import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
-import { PGlite } from '@electric-sql/pglite'
+import type { PGlite } from '@electric-sql/pglite'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
+import { RAIZ, abrirBanco } from './apoio/banco.ts'
 
 // O banco que o pipeline gera (python pipeline.py), conferido contra os CSVs limpos que o alimentaram
-const RAIZ = fileURLToPath(new URL('../..', import.meta.url))
-const BANCO = resolve(RAIZ, 'web/public/banco.tar.gz')
 const LIMPOS = resolve(RAIZ, 'dados/limpos')
 const TABELAS = [
   'adr.empreendimento', 'adr.unidade', 'adr.imobiliaria', 'adr.corretor', 'adr.lead', 'adr.cliente',
@@ -23,8 +21,7 @@ function linhasDoCsv(tabela: string): number {
 let db: PGlite
 
 beforeAll(async () => {
-  if (!existsSync(BANCO)) throw new Error('web/public/banco.tar.gz não existe: rode python pipeline.py antes')
-  db = await PGlite.create({ loadDataDir: new Blob([readFileSync(BANCO)]) })
+  db = await abrirBanco()
 })
 
 afterAll(async () => {
