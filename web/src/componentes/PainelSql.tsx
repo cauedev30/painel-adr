@@ -4,9 +4,9 @@ import { CONSULTAS } from '../banco/consultas.ts'
 import { nomeDoEmpreendimento } from '../empreendimentos.ts'
 import { data } from '../formatar.ts'
 import { PADRAO, escreverHash } from '../navegacao/rotas.ts'
+import { CodigoSql } from './CodigoSql.tsx'
 import { Icone } from './Icone.tsx'
 import css from './PainelSql.module.css'
-import { realcarSql } from './realceSql.ts'
 
 type Props = {
   id: string
@@ -98,11 +98,7 @@ export function PainelSql({ id, params, aberto, aoFechar }: Props) {
           <span className="so-leitor" aria-live="polite">{copia === 'copiado' ? 'SQL copiado' : copia === 'falhou' ? 'Não deu para copiar o SQL' : ''}</span>
         </div>
 
-        <pre className={css.codigo}>
-          <code>
-            {realcarSql(sql).map((p, i) => p.tipo === 'texto' ? p.texto : <span key={i} className={css[p.tipo]}>{p.texto}</span>)}
-          </code>
-        </pre>
+        <CodigoSql sql={sql} />
       </div>
     </dialog>
   )

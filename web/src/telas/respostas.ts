@@ -286,3 +286,24 @@ export function respostaDistratos([l]: LinhaDistratos[]): string {
   if (l.com_atraso_60 === l.distratos) return `Os ${inteiro(l.distratos)} distratos do período vieram ${depois}`
   return `${inteiro(l.com_atraso_60)} dos ${inteiro(l.distratos)} distratos do período (${pct(l.pct ?? 0, 0)}) vieram ${depois}`
 }
+
+// ---- Dados ----
+
+export function respostaDer(linhas: { tabela: string; fk_tabela: string | null }[]): string {
+  const tabelas = new Set(linhas.map((l) => l.tabela)).size
+  const relacoes = linhas.filter((l) => l.fk_tabela !== null).length
+  return `${inteiro(tabelas)} ${tabelas === 1 ? 'tabela' : 'tabelas'} e ${inteiro(relacoes)} ${relacoes === 1 ? 'relação' : 'relações'}, lidas do catálogo do próprio banco; escolha uma tabela para ver o dicionário`
+}
+
+export type LinhaQualidade = { regra: string; origem: string; descricao: string; linhas_afetadas: number; acao: string }
+
+/** "O pipeline tratou 4.312 linhas em 7 regras; 22 foram para a quarentena e 57 saíram com elas, em cascata". */
+export function respostaQualidade(linhas: LinhaQualidade[]): string {
+  const total = linhas.reduce((s, l) => s + l.linhas_afetadas, 0)
+  const regras = new Set(linhas.map((l) => l.regra)).size
+  const quarentena = linhas.filter((l) => l.acao === 'quarentena').reduce((s, l) => s + l.linhas_afetadas, 0)
+  const cascata = linhas.filter((l) => l.acao === 'cascata').reduce((s, l) => s + l.linhas_afetadas, 0)
+  const barradas = quarentena === 0 ? 'nenhuma foi para a quarentena' : `${inteiro(quarentena)} foram para a quarentena`
+  const emCascata = cascata === 0 ? '' : ` e ${inteiro(cascata)} saíram com elas, em cascata`
+  return `O pipeline tratou ${inteiro(total)} linhas em ${inteiro(regras)} ${regras === 1 ? 'regra' : 'regras'}; ${barradas}${emCascata}`
+}

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { GLOSSARIO } from '../../src/glossario.ts'
 import {
   KPIS, type LinhaEmpreendimento, type LinhaRanking, canalQueMaisConverte, lerKpi, respostaCanais, respostaDistribuicao, respostaEmpreendimentos, respostaEstatisticas, respostaRitmo,
-  KPIS_RECEBIVEIS, respostaDistratos, textoDaComparacao, respostaFaixas, respostaFunil, respostaInadDesconto, respostaInadEmpreendimento,
+  KPIS_RECEBIVEIS, respostaDer, respostaDistratos, respostaQualidade, textoDaComparacao, respostaFaixas, respostaFunil, respostaInadDesconto, respostaInadEmpreendimento,
   respostaMapaCalor, respostaPrevistoRecebido, respostaRanking, respostaVendasMensais, respostaVistaMar, variacaoDePosicao,
 } from '../../src/telas/respostas.ts'
 import { abrirBanco, rodar } from '../apoio/banco.ts'
@@ -206,5 +206,20 @@ describe('texto da comparação dos KPIs', () => {
     expect(textoDaComparacao(kpi('inadimplencia'), rota)).toBe('fim de set/2025')
     expect(textoDaComparacao(kpi('a_receber_12m'), rota)).toBe('fim de set/2025')
     expect(textoDaComparacao(kpi('vgv'), { ...rota, de: '2026-09' })).toBe('ago/2026')
+  })
+})
+
+describe('frases de Dados', () => {
+  it('DER: tabelas e relações', () => {
+    expect(respostaDer([
+      { tabela: 'adr.venda', fk_tabela: 'adr.unidade' }, { tabela: 'adr.venda', fk_tabela: null }, { tabela: 'adr.unidade', fk_tabela: null },
+    ])).toBe('2 tabelas e 1 relação, lidas do catálogo do próprio banco; escolha uma tabela para ver o dicionário')
+  })
+
+  it('qualidade: o total, a quarentena e a cascata', () => {
+    const q = (regra: string, linhas_afetadas: number, acao: string) => ({ regra, origem: 'x', descricao: 'x', linhas_afetadas, acao })
+    expect(respostaQualidade([q('R1', 634, 'mesclado'), q('R4', 4, 'quarentena'), q('R4', 42, 'cascata'), q('R7', 2, 'quarentena')]))
+      .toBe('O pipeline tratou 682 linhas em 3 regras; 6 foram para a quarentena e 42 saíram com elas, em cascata')
+    expect(respostaQualidade([q('R3', 10, 'corrigido')])).toBe('O pipeline tratou 10 linhas em 1 regra; nenhuma foi para a quarentena')
   })
 })
