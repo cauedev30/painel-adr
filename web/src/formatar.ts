@@ -35,6 +35,11 @@ export function moeda(valor: number): string {
   return MOEDA.format(valor).replace(ESPACO_DURO, ' ')
 }
 
+/** R$ 18.193: reais inteiros, para preço por m² (os centavos não dizem nada ali). */
+export function reais(valor: number): string {
+  return `R$ ${decimal(0).format(valor)}`
+}
+
 /** 0,081 → 8,1% */
 export function pct(fracao: number, casas = 1): string {
   return porcentagem(casas).format(fracao)

@@ -1,31 +1,44 @@
 import faixa from '../assets/faixa-noturna.webp'
 import { Cartao } from '../componentes/Cartao.tsx'
-import { EmConstrucao } from '../componentes/EmConstrucao.tsx'
+import { Conclusoes } from '../componentes/Conclusoes.tsx'
+import { Kpi } from '../componentes/Kpi.tsx'
 import { inteiro, mes } from '../formatar.ts'
-import { paramsDaRota } from '../navegacao/rotas.ts'
+import { paramsDaRota, periodoAnterior } from '../navegacao/rotas.ts'
 import { PALETA } from '../tema/paleta.ts'
-import { type MesDeVendas, respostaVendasMensais } from './respostas.ts'
+import { KPIS, type MesDeVendas, respostaVendasMensais } from './respostas.ts'
 import css from './Telas.module.css'
 import type { PropsDaTela } from './tipos.ts'
 
+const umaCasa = (v: number) => v.toFixed(1).replace('.', ',')
+
 export function VisaoGeral({ rota }: PropsDaTela) {
+  const params = paramsDaRota(rota)
+  const anterior = periodoAnterior(rota)
+  const textoAnterior = anterior.de === anterior.ate ? mes(anterior.de) : `${mes(anterior.de)}–${mes(anterior.ate)}`
+
   return (
     <div className={css.tela}>
       <figure className={css.faixaFoto}>
         <img src={faixa} alt="O Mares Seaview à noite" />
+        <p className={css.slogan}>Ousadia que constrói valor</p>
         <figcaption>Mares Seaview à noite</figcaption>
       </figure>
+
+      <section aria-label="Indicadores do período" className={css.kpis}>
+        {KPIS.map((k) => <Kpi key={k.id} kpi={k} params={params} periodoAnterior={textoAnterior} />)}
+      </section>
 
       <Cartao<MesDeVendas>
         id="vendas-mensais"
         titulo="As vendas estão no ritmo da meta?"
         consulta="visao-geral/vendas_mensais"
-        params={paramsDaRota(rota)}
+        params={params}
         resposta={respostaVendasMensais}
+        formatoDoValor={(v) => (Number.isInteger(v) ? inteiro(v) : umaCasa(v))}
         grafico={(linhas) => ({
           grid: { left: 40, right: 16, top: 40, bottom: 32 },
-          // 2 séries: legenda sempre (seção 6.3); a forma (barra × linha tracejada) separa além da cor
-          legend: { top: 0, right: 0, data: ['Vendas', 'Meta'] },
+          // 3 séries: legenda sempre (seção 6.3); a forma separa além da cor (barra, tracejado, linha)
+          legend: { top: 0, right: 0, data: ['Vendas', 'Meta', 'Média móvel de 3 meses'] },
           xAxis: { type: 'category', data: linhas.map((l) => mes(l.mes)) },
           yAxis: { type: 'value', minInterval: 1, name: 'unidades', nameTextStyle: { align: 'left' } },
           series: [
@@ -39,20 +52,23 @@ export function VisaoGeral({ rota }: PropsDaTela) {
               lineStyle: { color: PALETA.cinza, width: 2, type: 'dashed' }, itemStyle: { color: PALETA.cinza },
               z: 3,
             },
+            {
+              type: 'line', name: 'Média móvel de 3 meses', data: linhas.map((l) => l.media_movel_3m), smooth: 0.3,
+              symbol: 'circle', symbolSize: 6, showSymbol: false,
+              lineStyle: { color: PALETA.texto2, width: 2 }, itemStyle: { color: PALETA.texto2 },
+              z: 4,
+            },
           ],
         })}
         colunas={[
           { chave: 'mes', titulo: 'Mês', formato: mes },
           { chave: 'vendas', titulo: 'Vendas', numerica: true, formato: inteiro },
           { chave: 'meta', titulo: 'Meta', numerica: true, formato: inteiro },
-          { chave: 'media_movel_3m', titulo: 'Média móvel de 3 meses', numerica: true, formato: (v: number) => v.toFixed(1).replace('.', ',') },
+          { chave: 'media_movel_3m', titulo: 'Média móvel de 3 meses', numerica: true, formato: umaCasa },
         ]}
       />
 
-      <EmConstrucao cartoes={[
-        '6 KPIs: VGV vendido, VSO, estoque, ticket médio, preço/m² e inadimplência, cada um com a variação',
-        'O que os dados dizem: as 5 conclusões, cada uma com o link para o gráfico que a prova',
-      ]} />
+      <Conclusoes rota={rota} params={params} />
     </div>
   )
 }

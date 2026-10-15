@@ -60,6 +60,11 @@ export function escreverHash(rota: Rota): string {
   return `#/${rota.tela}?${params}`
 }
 
+/** O link para um cartão, com os filtros atuais: #/recebiveis?de=…&ate=…&cartao=distratos. A tela rola até ele. */
+export function linkDoCartao(rota: Rota, tela: IdTela, cartao: string): string {
+  return escreverHash({ ...rota, tela, extra: { cartao } })
+}
+
 function somarMeses(anoMes: string, n: number): string {
   const [ano, mes] = anoMes.split('-').map(Number)
   const d = new Date(Date.UTC(ano, mes - 1 + n, 1))

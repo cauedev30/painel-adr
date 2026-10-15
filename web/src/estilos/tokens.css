@@ -20,6 +20,10 @@
   /* só em seleção e foco */
   --dourado: #e6b85c;
 
+  /* a seta dos KPIs: melhorou ou piorou */
+  --bom: #3fb950;
+  --ruim: #f0605a;
+
   /* faixas de atraso, do mais claro (1–30 dias) ao mais intenso (mais de 90) */
   --atraso-1: #f4b2a6;
   --atraso-2: #ec7f6d;

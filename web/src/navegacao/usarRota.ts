@@ -1,4 +1,4 @@
-import { useCallback, useSyncExternalStore } from 'react'
+import { useCallback, useEffect, useSyncExternalStore } from 'react'
 import { type Rota, escreverHash, lerHash } from './rotas.ts'
 
 function assinar(avisar: () => void): () => void {
@@ -26,4 +26,21 @@ export function usarRota(): [Rota, (mudanca: Partial<Rota>) => void] {
   }, [])
 
   return [rota, navegar]
+}
+
+/**
+ * O link de uma conclusão (`?cartao=<id>`) abre a tela já no cartão: rola até ele e põe o foco nele,
+ * para o teclado e o leitor de tela continuarem dali.
+ */
+export function usarCartaoEmFoco(rota: Rota, pronto: boolean): void {
+  const cartao = rota.extra.cartao
+  useEffect(() => {
+    if (!pronto || !cartao) return
+    const quadro = requestAnimationFrame(() => {
+      const alvo = document.getElementById(cartao)
+      alvo?.scrollIntoView({ block: 'start' })
+      alvo?.focus({ preventScroll: true })
+    })
+    return () => cancelAnimationFrame(quadro)
+  }, [pronto, rota.tela, cartao])
 }

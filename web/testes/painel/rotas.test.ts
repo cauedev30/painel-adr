@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
-  MESES_DOS_DADOS, PADRAO, PRIMEIRO_MES, TELAS, ULTIMO_MES, escreverHash, lerHash, paramsDaRota, periodoAnterior,
+  MESES_DOS_DADOS, PADRAO, PRIMEIRO_MES, TELAS, ULTIMO_MES, escreverHash, lerHash, linkDoCartao, paramsDaRota, periodoAnterior,
 } from '../../src/navegacao/rotas.ts'
 
 describe('as telas', () => {
@@ -66,5 +66,14 @@ describe('parâmetros das consultas', () => {
     expect(periodoAnterior(lerHash(''))).toEqual({ de: '2024-10', ate: '2025-09' })
     expect(periodoAnterior(lerHash('#/visao-geral?de=2026-09&ate=2026-09'))).toEqual({ de: '2026-08', ate: '2026-08' })
     expect(periodoAnterior(lerHash('#/visao-geral?de=2026-01&ate=2026-03'))).toEqual({ de: '2025-10', ate: '2025-12' })
+  })
+})
+
+describe('linkDoCartao', () => {
+  it('leva para o cartão de outra tela com os mesmos filtros, e a ida e volta preserva o cartão', () => {
+    const rota = { ...PADRAO, emp: 2, extra: { consulta: 'x' } }
+    const link = linkDoCartao(rota, 'recebiveis', 'distratos')
+    expect(link).toBe('#/recebiveis?de=2025-10&ate=2026-09&emp=2&cartao=distratos')
+    expect(lerHash(link)).toEqual({ tela: 'recebiveis', de: '2025-10', ate: '2026-09', emp: 2, extra: { cartao: 'distratos' } })
   })
 })

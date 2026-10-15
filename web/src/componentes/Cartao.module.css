@@ -9,8 +9,9 @@
   scroll-margin-top: var(--esp-5);
 }
 
-/* a âncora das conclusões: o cartão linkado ganha uma borda em cobre */
-.cartao:target {
+/* o cartão aberto por um link das conclusões recebe o foco e ganha a borda em cobre */
+.cartao:focus {
+  outline: none;
   border-color: var(--cobre);
 }
 

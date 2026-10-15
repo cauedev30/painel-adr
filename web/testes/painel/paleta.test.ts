@@ -28,7 +28,7 @@ describe('contraste WCAG', () => {
     expect(contraste(PALETA.texto2, PALETA[fundo])).toBeGreaterThanOrEqual(4.5)
   })
 
-  it.each(['cobre', 'cobreForte', 'cinza', 'dourado', 'atraso1', 'atraso2', 'atraso3', 'atraso4'] as const)(
+  it.each(['cobre', 'cobreForte', 'cinza', 'dourado', 'bom', 'ruim', 'atraso1', 'atraso2', 'atraso3', 'atraso4'] as const)(
     '%s sobre a superfície passa de 3 (marca de gráfico e foco)', (cor) => {
       expect(contraste(PALETA[cor], PALETA.superficie)).toBeGreaterThanOrEqual(3)
     })

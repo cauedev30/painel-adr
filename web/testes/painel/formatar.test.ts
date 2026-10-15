@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { data, inteiro, mes, moeda, moedaCompacta, pct, variacao } from '../../src/formatar.ts'
+import { data, inteiro, mes, moeda, moedaCompacta, pct, reais, variacao } from '../../src/formatar.ts'
 
 describe('moedaCompacta', () => {
   it.each([
@@ -87,5 +87,13 @@ describe('variacao', () => {
     expect(variacao(0.0745, 0.0745, 'pontos')).toEqual({ seta: '=', texto: '0,0 p.p.' })
     expect(variacao(0.373, 0.336, 'pontos')).toEqual({ seta: '▲', texto: '+3,7 p.p.' })
     expect(variacao(0.2, 0, 'pontos')).toEqual({ seta: '▲', texto: '+20,0 p.p.' })
+  })
+})
+
+describe('reais', () => {
+  it('em reais inteiros, para preço por m²', () => {
+    expect(reais(18_192.77)).toBe('R$ 18.193')
+    expect(reais(312)).toBe('R$ 312')
+    expect(reais(312)[2]).toBe(' ')
   })
 })

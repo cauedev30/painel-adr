@@ -19,6 +19,11 @@ export const PALETA = {
   cobreForte: '#e09a58',
   // dourado só em seleção e foco
   dourado: '#e6b85c',
+  // a seta dos KPIs: melhorou ou piorou contra o período anterior. É estado, não série: só pinta a
+  // seta, que já diz a direção pela forma (▲/▼) e vem com o texto ao lado; para quem não distingue
+  // verde de vermelho, o leitor de tela e o balão dizem "melhorou" ou "piorou" (seção 6.3)
+  bom: '#3fb950',
+  ruim: '#f0605a',
   // faixas de atraso: um tom de vermelho, do mais claro (1–30 dias) ao mais intenso (mais de 90)
   atraso1: '#f4b2a6',
   atraso2: '#ec7f6d',

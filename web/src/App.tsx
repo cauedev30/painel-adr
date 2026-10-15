@@ -5,7 +5,7 @@ import { BarraLateral } from './componentes/BarraLateral.tsx'
 import { Carregando } from './componentes/Carregando.tsx'
 import { FaixaSuperior } from './componentes/FaixaSuperior.tsx'
 import type { IdTela } from './navegacao/rotas.ts'
-import { usarRota } from './navegacao/usarRota.ts'
+import { usarCartaoEmFoco, usarRota } from './navegacao/usarRota.ts'
 import { Console } from './telas/Console.tsx'
 import { Dados } from './telas/Dados.tsx'
 import { FunilCorretores } from './telas/FunilCorretores.tsx'
@@ -26,6 +26,7 @@ const TELAS: Record<IdTela, ComponentType<PropsDaTela>> = {
 export function App() {
   const banco = usarBanco()
   const [rota, navegar] = usarRota()
+  usarCartaoEmFoco(rota, banco.pronto)
   if (!banco.pronto) return <Carregando erro={banco.erro} tentarDeNovo={banco.tentarDeNovo} />
 
   const Tela = TELAS[rota.tela]

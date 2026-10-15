@@ -43,7 +43,7 @@ export function Cartao<T>({ id, titulo, consulta, params, resposta, grafico, col
   else frase = resposta(linhas)
 
   return (
-    <section id={id} className={css.cartao} aria-labelledby={`${id}-titulo`} aria-busy={carregando}>
+    <section id={id} className={css.cartao} tabIndex={-1} aria-labelledby={`${id}-titulo`} aria-busy={carregando}>
       <header className={css.cabecalho}>
         <h2 id={`${id}-titulo`} className={css.titulo}>{titulo}</h2>
         <p className={css.resposta} aria-live="polite">{frase}</p>
