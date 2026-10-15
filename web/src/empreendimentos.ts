@@ -15,3 +15,10 @@ export type Empreendimento = (typeof EMPREENDIMENTOS)[number]
 export function nomeDoEmpreendimento(id: number | null): string {
   return EMPREENDIMENTOS.find((e) => e.id === id)?.nome ?? 'Todos os empreendimentos'
 }
+
+/** O status como o site da ADR escreve (adr.empreendimento.status). */
+export const STATUS: Record<string, string> = {
+  entregue: 'Entregue',
+  em_obras: 'Em construção',
+  pre_lancamento: 'Pré-lançamento',
+}

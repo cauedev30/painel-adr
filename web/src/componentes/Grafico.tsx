@@ -1,7 +1,7 @@
 // O ECharts do painel (D5.4): só o que se usa, importado de echarts/core, com o tema da ADR. Este
 // componente cuida do init, do redimensionamento e do dispose; o cartão só monta a opção.
 import type { EChartsOption } from 'echarts'
-import { BarChart, LineChart } from 'echarts/charts'
+import { BarChart, BoxplotChart, LineChart, ScatterChart } from 'echarts/charts'
 import { AriaComponent, GridComponent, LegendComponent, TooltipComponent } from 'echarts/components'
 import * as echarts from 'echarts/core'
 import { SVGRenderer } from 'echarts/renderers'
@@ -9,7 +9,7 @@ import { useEffect, useRef } from 'react'
 import { inteiro } from '../formatar.ts'
 import { TEMA, TEMA_ECHARTS } from '../tema/echarts.ts'
 
-echarts.use([BarChart, LineChart, AriaComponent, GridComponent, LegendComponent, TooltipComponent, SVGRenderer])
+echarts.use([BarChart, BoxplotChart, LineChart, ScatterChart, AriaComponent, GridComponent, LegendComponent, TooltipComponent, SVGRenderer])
 echarts.registerTheme(TEMA, TEMA_ECHARTS)
 
 type Props = {

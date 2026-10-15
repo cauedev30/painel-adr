@@ -5,7 +5,7 @@ import { PARAMS_PADRAO, type Param, abrirBanco, rodar } from '../apoio/banco.ts'
 type Kpi = { valor: number | null; valor_anterior: number | null }
 type Empreendimento = {
   empreendimento_id: number; nome: string; slug: string; status: string
-  unidades: number; vendidas: number; estoque: number; vso: number | null; vgv: number
+  unidades: number; vendidas: number; estoque: number; vso: number | null; vgv: number; interessados: number
 }
 type Ritmo = { empreendimento_id: number; nome: string; mes_desde_lancamento: number; vendidas_acumuladas: number; pct_vendido: number }
 type Caixa = { empreendimento_id: number; nome: string; minimo: number; q1: number; mediana: number; q3: number; maximo: number; outliers: number[] }
@@ -43,6 +43,16 @@ describe('cartões por empreendimento', () => {
       const [vgv] = await rodar<Kpi>(db, 'visao-geral/kpi_vgv', params)
       expect(cartoes.reduce((s, c) => s + c.vgv, 0)).toBeCloseTo(vgv.valor!, 2)
     }
+  })
+
+  it('interessados é a lista de interesse até o fim do período, e os de pré-lançamento já têm a sua', async () => {
+    const cartoes = await rodar<Empreendimento>(db, 'vendas-estoque/empreendimentos')
+    for (const c of cartoes) {
+      const r = await db.query<{ n: number }>(
+        `select count(*)::int as n from adr.lead where empreendimento_id = $1 and data_entrada < '2026-10-01'`, [c.empreendimento_id])
+      expect(c.interessados).toBe(r.rows[0].n)
+    }
+    for (const c of cartoes.filter((x) => x.status === 'pre_lancamento')) expect(c.interessados).toBeGreaterThan(0)
   })
 
   it('em cada empreendimento, vendidas + estoque = unidades', async () => {

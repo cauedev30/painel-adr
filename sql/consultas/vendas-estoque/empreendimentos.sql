@@ -2,7 +2,8 @@
 -- Parâmetros: $1 início e $2 fim do período (meses inteiros), $3 empreendimento (nulo = todos)
 -- Devolve: empreendimento_id, nome, slug, status, unidades (lançadas até o fim do período),
 --          vendidas e estoque (no fim do período), vso (do período, como o KPI) e vgv (líquido do
---          período, como o KPI); um empreendimento por linha
+--          período, como o KPI) e interessados (leads que entraram até o fim do período: a lista de
+--          interesse, a única coisa que os de pré-lançamento têm); um empreendimento por linha
 with params as (select $1::date as inicio, $2::date as fim, $3::smallint as empreendimento_id),
 empreendimentos as (
   select e.id, e.nome, e.slug, e.status, e.data_lancamento
@@ -39,6 +40,12 @@ vendas as (
        - coalesce(sum(v.valor_venda) filter (where v.data_distrato between p.inicio and p.fim), 0) as vgv
   from adr.vw_venda v, params p
   group by v.empreendimento_id
+),
+interesse as (
+  select l.empreendimento_id, count(*) as interessados
+  from adr.lead l, params p
+  where l.data_entrada < p.fim + 1  -- data_entrada tem hora
+  group by l.empreendimento_id
 )
 select e.id                                                   as empreendimento_id,
        e.nome,
@@ -48,8 +55,10 @@ select e.id                                                   as empreendimento_
        coalesce(es.vendidas, 0)::int                          as vendidas,
        coalesce(es.unidades - es.vendidas, 0)::int            as estoque,
        (vs.vendas::float8 / nullif(es.a_venda_no_periodo, 0)) as vso,
-       coalesce(vs.vgv, 0)::float8                            as vgv
+       coalesce(vs.vgv, 0)::float8                            as vgv,
+       coalesce(i.interessados, 0)::int                       as interessados
 from empreendimentos e
-left join estoque es on es.empreendimento_id = e.id
-left join vendas vs  on vs.empreendimento_id = e.id
+left join estoque es  on es.empreendimento_id = e.id
+left join vendas vs   on vs.empreendimento_id = e.id
+left join interesse i on i.empreendimento_id = e.id
 order by e.id;

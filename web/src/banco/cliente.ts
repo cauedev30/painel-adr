@@ -38,9 +38,17 @@ export function abrirBanco(): Promise<PGliteWorker> {
   return banco
 }
 
-export async function consultar<T = Record<string, unknown>>(sql: string, params: Param[] = []): Promise<Resultado<T>> {
-  const db = await abrirBanco()
-  const inicio = performance.now()
-  const r = await db.query<T>(sql, params)
-  return { linhas: r.rows, campos: r.fields, ms: performance.now() - inicio }
+// O PGlite roda uma consulta por vez. A fila fica aqui, e não no worker, para o tempo de cada consulta
+// contar só a execução dela: com a fila no worker, o último de 5 cartões mostraria a espera pelos outros 4.
+let fila: Promise<unknown> = Promise.resolve()
+
+export function consultar<T = Record<string, unknown>>(sql: string, params: Param[] = []): Promise<Resultado<T>> {
+  const vez = fila.then(async () => {
+    const db = await abrirBanco()
+    const inicio = performance.now()
+    const r = await db.query<T>(sql, params)
+    return { linhas: r.rows, campos: r.fields, ms: performance.now() - inicio }
+  })
+  fila = vez.catch(() => undefined)
+  return vez
 }

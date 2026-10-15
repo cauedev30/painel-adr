@@ -73,6 +73,176 @@
   color: var(--cobre-forte);
 }
 
+/* ---- Vendas e estoque ---- */
+
+.empreendimentos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--esp-4);
+}
+
+.preLancamento {
+  list-style: none;
+  margin: var(--esp-4) 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--esp-4);
+}
+
+.empreendimento {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-2);
+  padding: var(--esp-3);
+  background: var(--superficie-2);
+  border-radius: var(--raio);
+}
+
+.empreendimentoTopo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--esp-1) var(--esp-2);
+}
+
+.empreendimentoTopo h3 {
+  font-size: var(--tamanho-texto);
+  font-weight: 600;
+}
+
+.status {
+  font-size: 0.75rem;
+  color: var(--texto-2);
+  border: 1px solid var(--borda);
+  border-radius: 999px;
+  padding: 0 var(--esp-2);
+}
+
+/* vendido em cobre sobre o trilho do estoque */
+.barra {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--borda);
+  overflow: hidden;
+}
+
+.barra span {
+  display: block;
+  height: 100%;
+  background: var(--cobre);
+  border-radius: 4px;
+}
+
+.legendaBarra {
+  font-size: var(--tamanho-pequeno);
+  color: var(--texto-2);
+}
+
+.numeros {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-2) var(--esp-5);
+}
+
+.numeros dt {
+  font-size: 0.75rem;
+  color: var(--texto-2);
+}
+
+.numeros dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+/* gráficos pequenos lado a lado (seção 6.3) */
+.multiplos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--esp-4) var(--esp-5);
+}
+
+.multiplosDois {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--esp-4) var(--esp-6);
+}
+
+.multiploTitulo {
+  font-size: var(--tamanho-pequeno);
+  font-weight: 600;
+}
+
+.multiploTitulo span {
+  font-weight: 400;
+  color: var(--texto-2);
+}
+
+.estatisticas dl {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--esp-3);
+}
+
+.estatistica {
+  padding: var(--esp-3);
+  background: var(--superficie-2);
+  border-radius: var(--raio-pequeno);
+}
+
+.estatistica dt {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-2);
+  font-size: var(--tamanho-pequeno);
+  color: var(--texto-2);
+}
+
+.estatistica dd {
+  margin: 0;
+  font-size: var(--tamanho-subtitulo);
+  font-weight: 600;
+}
+
+.ajuda {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid var(--borda);
+  border-radius: 50%;
+  background: none;
+  color: var(--texto-2);
+  font-size: 0.75rem;
+  line-height: 1;
+}
+
+.ajuda:hover,
+.ajuda[aria-expanded='true'] {
+  color: var(--texto);
+  border-color: var(--cobre);
+}
+
+.explicacao {
+  margin-top: var(--esp-2);
+  font-size: var(--tamanho-pequeno);
+  color: var(--texto-2);
+}
+
+.notaRodape {
+  margin-top: var(--esp-3);
+  font-size: var(--tamanho-pequeno);
+  color: var(--texto-2);
+}
+
 @media (max-width: 1099px) {
   .kpis {
     grid-template-columns: repeat(2, 1fr);
