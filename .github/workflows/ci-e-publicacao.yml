@@ -47,6 +47,11 @@ jobs:
       - name: Testes do pipeline (pytest)
         run: python -m pytest
 
+      # D7.2: o notebook roda do zero e não pode quebrar quando o pipeline muda; a cópia executada vai
+      # para uma pasta temporária, e a do repositório fica como está
+      - name: Notebook
+        run: jupyter nbconvert --to notebook --execute --output-dir /tmp notebooks/tour-do-pipeline.ipynb
+
       - name: Testes do painel (Vitest)
         working-directory: web
         run: npm test
