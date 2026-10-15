@@ -1,0 +1,88 @@
+.cartao {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-4);
+  padding: var(--esp-5);
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  scroll-margin-top: var(--esp-5);
+}
+
+/* a âncora das conclusões: o cartão linkado ganha uma borda em cobre */
+.cartao:target {
+  border-color: var(--cobre);
+}
+
+.cabecalho {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-2);
+}
+
+/* a pergunta em texto corrido: a caixa alta da Lexend Zetta fica só nos títulos de tela */
+.titulo {
+  font-family: var(--fonte-texto);
+  font-size: var(--tamanho-subtitulo);
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.resposta {
+  color: var(--texto-2);
+}
+
+.corpo {
+  position: relative;
+  transition: opacity 0.2s;
+}
+
+.corpo[data-carregando='true'] {
+  opacity: 0.45;
+}
+
+.erro {
+  color: var(--atraso-1);
+}
+
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--esp-2);
+}
+
+.acoes button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--esp-2);
+  padding: var(--esp-1) var(--esp-3);
+  background: none;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-pequeno);
+  color: var(--texto-2);
+  font-size: var(--tamanho-pequeno);
+}
+
+.acoes button:hover {
+  color: var(--texto);
+  border-color: var(--cobre);
+}
+
+.acoes button[aria-pressed='true'] {
+  color: var(--texto);
+  border-color: var(--texto-2);
+}
+
+.tempo {
+  margin-left: auto;
+  font-size: var(--tamanho-pequeno);
+  color: var(--texto-2);
+}
+
+@media (max-width: 899px) {
+  .cartao {
+    padding: var(--esp-4);
+  }
+}

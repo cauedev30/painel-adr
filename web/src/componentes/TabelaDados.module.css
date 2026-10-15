@@ -1,0 +1,34 @@
+.rolagem {
+  max-height: 320px;
+  overflow: auto;
+}
+
+.tabela {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--tamanho-pequeno);
+}
+
+.tabela th,
+.tabela td {
+  padding: var(--esp-2) var(--esp-3);
+  text-align: left;
+  border-bottom: 1px solid var(--borda);
+  white-space: nowrap;
+}
+
+.tabela th {
+  position: sticky;
+  top: 0;
+  background: var(--superficie);
+  color: var(--texto-2);
+  font-weight: 400;
+}
+
+.tabela .numero {
+  text-align: right;
+}
+
+.tabela tbody tr:hover {
+  background: var(--superficie-2);
+}
