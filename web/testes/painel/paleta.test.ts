@@ -28,6 +28,12 @@ describe('contraste WCAG', () => {
     expect(contraste(PALETA.texto2, PALETA[fundo])).toBeGreaterThanOrEqual(4.5)
   })
 
+  it('cobreForte, o texto dos links e das palavras-chave, passa de 4,5 sobre a superfície (AA)', () => {
+    expect(contraste(PALETA.cobreForte, PALETA.superficie)).toBeGreaterThanOrEqual(4.5)
+    expect(contraste(PALETA.cobreForte, PALETA.fundo)).toBeGreaterThanOrEqual(4.5)
+    expect(contraste(PALETA.dourado, PALETA.fundo)).toBeGreaterThanOrEqual(4.5)
+  })
+
   it.each(['cobre', 'cobreForte', 'cinza', 'dourado', 'bom', 'ruim', 'atraso1', 'atraso2', 'atraso3', 'atraso4'] as const)(
     '%s sobre a superfície passa de 3 (marca de gráfico e foco)', (cor) => {
       expect(contraste(PALETA[cor], PALETA.superficie)).toBeGreaterThanOrEqual(3)

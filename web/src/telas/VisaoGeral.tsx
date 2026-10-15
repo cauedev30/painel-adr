@@ -34,9 +34,9 @@ export function VisaoGeral({ rota }: PropsDaTela) {
         resposta={respostaVendasMensais}
         formatoDoValor={(v) => (Number.isInteger(v) ? inteiro(v) : umaCasa(v))}
         grafico={(linhas) => ({
-          grid: { left: 40, right: 16, top: 40, bottom: 32 },
+          grid: { left: 40, right: 16, top: 64, bottom: 32 },
           // 3 séries: legenda sempre (seção 6.3); a forma separa além da cor (barra, tracejado, linha)
-          legend: { top: 0, right: 0, data: ['Vendas', 'Meta', 'Média móvel de 3 meses'] },
+          legend: { top: 0, left: 0, data: ['Vendas', 'Meta', 'Média móvel de 3 meses'] },
           xAxis: { type: 'category', data: linhas.map((l) => mes(l.mes)) },
           yAxis: { type: 'value', minInterval: 1, name: 'unidades', nameTextStyle: { align: 'left' } },
           series: [

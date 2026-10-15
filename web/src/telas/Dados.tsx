@@ -157,7 +157,8 @@ function Dicionario({ linhas, tabelas, tabela, aoEscolher }: { linhas: LinhaDer[
           {colunas.map((c) => (
             <tr key={c.coluna}>
               <th scope="row">
-                <code>{c.coluna}</code>
+                {/* o nome longo só quebra depois de um "_" (data_venda → data_ / venda) */}
+                <code>{c.coluna.split('_').map((parte, i, partes) => <span key={i}>{parte}{i < partes.length - 1 && <>_<wbr /></>}</span>)}</code>
                 {c.pk && <span className={css.chave}>PK</span>}
                 {c.fk_tabela && <span className={css.chave} title={`referencia ${c.fk_tabela}.${c.fk_coluna}`}>FK</span>}
               </th>

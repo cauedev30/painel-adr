@@ -4,6 +4,7 @@ import { usarBanco } from './banco/usarConsulta.ts'
 import { BarraLateral } from './componentes/BarraLateral.tsx'
 import { Carregando } from './componentes/Carregando.tsx'
 import { FaixaSuperior } from './componentes/FaixaSuperior.tsx'
+import { Protecao } from './componentes/Protecao.tsx'
 import type { IdTela } from './navegacao/rotas.ts'
 import { usarCartaoEmFoco, usarRota } from './navegacao/usarRota.ts'
 import { Console } from './telas/Console.tsx'
@@ -40,7 +41,9 @@ export function App() {
       <div className={css.coluna}>
         <FaixaSuperior rota={rota} navegar={navegar} />
         <main id="conteudo" className={css.conteudo} tabIndex={-1}>
-          <Tela rota={rota} navegar={navegar} />
+          <Protecao key={rota.tela} aviso="Esta tela não conseguiu abrir.">
+            <Tela rota={rota} navegar={navegar} />
+          </Protecao>
         </main>
       </div>
     </div>

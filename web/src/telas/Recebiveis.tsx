@@ -71,7 +71,7 @@ export function Recebiveis({ rota }: PropsDaTela) {
         altura={200}
         formatoDoValor={moedaCompacta}
         grafico={(linhas) => ({
-          grid: { left: 140, right: 170, top: 4, bottom: 4 },
+          grid: { left: 112, right: 96, top: 4, bottom: 4 },
           xAxis: { type: 'value', show: false, min: 0 },
           // o ícone enche com o atraso e o rótulo diz a faixa: a cor nunca é a única pista
           yAxis: { type: 'category', data: linhas.map((l, i) => `${ICONES_DAS_FAIXAS[i]}  ${rotuloDaFaixa(l.faixa)}`), inverse: true, axisLine: { show: false } },
@@ -81,7 +81,8 @@ export function Recebiveis({ rota }: PropsDaTela) {
             data: linhas.map((l, i) => ({ value: l.saldo, itemStyle: { color: RAMPA_ATRASO[i], borderRadius: [0, 4, 4, 0] } })),
             label: {
               show: true, position: 'right', color: PALETA.texto,
-              formatter: ({ dataIndex }: { dataIndex: number }) => `${moedaCompacta(linhas[dataIndex].saldo)} · ${inteiro(linhas[dataIndex].parcelas)} parcelas`,
+              lineHeight: 15,
+              formatter: ({ dataIndex }: { dataIndex: number }) => `${moedaCompacta(linhas[dataIndex].saldo)}\n${inteiro(linhas[dataIndex].parcelas)} parcelas`,
             },
           }],
         })}

@@ -1,4 +1,5 @@
 .rolagem {
+  position: relative;  /* segura a legenda só para leitor de tela, que é absoluta, dentro da rolagem */
   max-height: 320px;
   overflow: auto;
 }

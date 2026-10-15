@@ -27,7 +27,7 @@ export function FunilCorretores({ rota }: PropsDaTela) {
         resposta={respostaFunil}
         altura={220}
         grafico={(linhas) => ({
-          grid: { left: 80, right: 200, top: 8, bottom: 8 },
+          grid: { left: 72, right: 110, top: 8, bottom: 8 },
           xAxis: { type: 'value', show: false, max: linhas[0].leads || 1 },
           yAxis: { type: 'category', data: linhas.map((l) => NOMES_DAS_ETAPAS[l.etapa] ?? l.etapa), inverse: true, axisLine: { show: false } },
           tooltip: {
@@ -47,7 +47,7 @@ export function FunilCorretores({ rota }: PropsDaTela) {
               show: true, position: 'right', color: PALETA.texto,
               formatter: ({ dataIndex }: { dataIndex: number }) => {
                 const l = linhas[dataIndex]
-                return l.conversao === null ? inteiro(l.leads) : `${inteiro(l.leads)}  ·  ${pct(l.conversao)} da etapa anterior`
+                return l.conversao === null ? inteiro(l.leads) : `${inteiro(l.leads)} · ${pct(l.conversao)}`
               },
             },
           }],
@@ -143,7 +143,7 @@ function Ranking({ linhas }: { linhas: LinhaRanking[] }) {
             <th scope="col" className={css.direita}>#</th>
             <th scope="col">Corretor</th>
             <th scope="col" className={css.direita}>Vendas</th>
-            <th scope="col" className={css.direita}>VGV</th>
+            <th scope="col" className={`${css.direita} ${css.vgv}`}>VGV</th>
             <th scope="col" className={css.direita}>Variação</th>
           </tr>
         </thead>
@@ -158,7 +158,7 @@ function Ranking({ linhas }: { linhas: LinhaRanking[] }) {
                   <span className={css.imobiliaria}>{l.imobiliaria ?? 'autônomo'}</span>
                 </td>
                 <td className={`${css.direita} numero`}>{inteiro(l.vendas)}</td>
-                <td className={`${css.direita} numero`}>{moedaCompacta(l.vgv)}</td>
+                <td className={`${css.direita} ${css.vgv} numero`}>{moedaCompacta(l.vgv)}</td>
                 <td className={`${css.direita} numero`} title={v.descricao}>
                   {v.texto === 'novo' ? (
                     <span className={css.novo}>novo</span>

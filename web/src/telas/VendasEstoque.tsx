@@ -214,7 +214,7 @@ function graficoDaCaixa(linhas: LinhaCaixa[]) {
   const nomes = linhas.map((l) => l.nome)
   const temFora = linhas.some((l) => l.outliers.length > 0)
   return {
-    grid: { left: 130, right: 24, top: temFora ? 36 : 12, bottom: 32 },
+    grid: { left: 118, right: 16, top: temFora ? 36 : 12, bottom: 40 },
     legend: temFora ? { top: 0, right: 0, data: ['Vendas do período', 'Fora da curva'] } : undefined,
     tooltip: {
       trigger: 'item' as const,
@@ -225,7 +225,7 @@ function graficoDaCaixa(linhas: LinhaCaixa[]) {
         return `${name}<br/>máximo ${reais(max)}<br/>Q3 ${reais(q3)}<br/><b>mediana ${reais(med)}</b><br/>Q1 ${reais(q1)}<br/>mínimo ${reais(min)}`
       },
     },
-    xAxis: { type: 'value' as const, scale: true, name: 'R$ por m²', nameLocation: 'middle' as const, nameGap: 24, axisLabel: { formatter: (v: number) => `${inteiro(v / 1000)} mil` } },
+    xAxis: { type: 'value' as const, scale: true, name: 'R$ por m²', nameLocation: 'middle' as const, nameGap: 24, axisLabel: { hideOverlap: true, formatter: (v: number) => `${inteiro(v / 1000)} mil` } },
     yAxis: { type: 'category' as const, data: nomes, inverse: true },
     series: [
       {

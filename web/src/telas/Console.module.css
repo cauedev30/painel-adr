@@ -136,6 +136,7 @@
 }
 
 .rolagem {
+  position: relative;
   max-height: 480px;
   overflow: auto;
   border: 1px solid var(--borda);

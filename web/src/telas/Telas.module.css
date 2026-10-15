@@ -52,27 +52,6 @@
   gap: var(--esp-4);
 }
 
-.grade {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: var(--esp-4);
-}
-
-.miniCartao {
-  display: flex;
-  flex-direction: column;
-  gap: var(--esp-2);
-  font-size: var(--tamanho-pequeno);
-  color: var(--texto-2);
-}
-
-.nota code {
-  color: var(--cobre-forte);
-}
-
 /* ---- Vendas e estoque ---- */
 
 .empreendimentos {
@@ -163,6 +142,7 @@
 /* ---- Funil e corretores ---- */
 
 .rolagemRanking {
+  position: relative;  /* segura o texto só para leitor de tela, que é absoluto, dentro da rolagem */
   max-height: 440px;
   overflow: auto;
 }
@@ -245,6 +225,7 @@
 }
 
 .rolagemMapa {
+  position: relative;
   overflow-x: auto;
 }
 
@@ -399,10 +380,9 @@
   font-weight: 400;
 }
 
-/* nome de coluna longo (empreendimento_id) quebra em vez de vazar do cartão; o tipo não quebra */
+/* o nome da coluna quebra só depois de "_" (ver Dados.tsx); o tipo não quebra */
 .colunas code {
   color: var(--texto);
-  overflow-wrap: anywhere;
 }
 
 .colunas td code {
@@ -639,5 +619,27 @@
 @media (max-width: 559px) {
   .kpis {
     grid-template-columns: 1fr;
+  }
+
+  /* no celular o slogan ocupa a base da foto, e a legenda sobe para o canto de cima */
+  .slogan {
+    max-width: none;
+    right: var(--esp-4);
+    font-size: 0.875rem;
+  }
+
+  .faixaFoto figcaption {
+    top: var(--esp-2);
+    bottom: auto;
+  }
+
+  .empreendimentos,
+  .preLancamento {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--esp-3);
+  }
+
+  .ranking .vgv {
+    display: none;
   }
 }

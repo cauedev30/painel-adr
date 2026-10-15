@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { exemplosDoConsole, paramsDosCampos, parametrosUsados, textoDaCelula, valoresDaRota } from '../../src/console.ts'
 import { PADRAO } from '../../src/navegacao/rotas.ts'
-import { PARAMS_PADRAO, abrirBanco, lerSql, rodar } from '../apoio/banco.ts'
+import { abrirBanco, filtravel, lerSql, listarConsultas, rodar } from '../apoio/banco.ts'
 
 describe('parâmetros do console', () => {
   it('conta o maior $n, ignorando comentário e texto entre aspas', () => {
@@ -17,14 +17,19 @@ describe('parâmetros do console', () => {
     expect(paramsDosCampos([' 2 ', 'texto'])).toEqual([2, 'texto'])
   })
 
-  it('"abrir no console" de um cartão dá o mesmo resultado do cartão', async () => {
+  it('"abrir no console" de qualquer cartão filtrável dá o mesmo resultado do cartão, com e sem empreendimento', async () => {
     const db = await abrirBanco()
-    const id = 'visao-geral/vendas_mensais'
-    const doCartao = await rodar(db, id, PARAMS_PADRAO)
-    const sql = lerSql(id)
-    const doConsole = (await db.query(sql, paramsDosCampos(valoresDaRota(PADRAO)).slice(0, parametrosUsados(sql)))).rows
+    const filtraveis = listarConsultas().filter((id) => filtravel(lerSql(id)))
+    expect(filtraveis.length).toBeGreaterThanOrEqual(20)
+    for (const rota of [PADRAO, { ...PADRAO, emp: 2 }]) {
+      for (const id of filtraveis) {
+        const sql = lerSql(id)
+        const doCartao = await rodar(db, id, [`${rota.de}-01`, '2026-09-30', rota.emp])
+        const doConsole = (await db.query(sql, paramsDosCampos(valoresDaRota(rota)).slice(0, parametrosUsados(sql)))).rows
+        expect(doConsole, id).toEqual(doCartao)
+      }
+    }
     await db.close()
-    expect(doConsole).toEqual(doCartao)
   })
 })
 

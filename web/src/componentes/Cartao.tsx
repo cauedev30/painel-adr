@@ -8,6 +8,7 @@ import css from './Cartao.module.css'
 import { Grafico } from './Grafico.tsx'
 import { Icone } from './Icone.tsx'
 import { PainelSql } from './PainelSql.tsx'
+import { Protecao } from './Protecao.tsx'
 import { type Coluna, TabelaDados } from './TabelaDados.tsx'
 
 type Props<T> = {
@@ -53,19 +54,21 @@ export function Cartao<T>({ id, titulo, consulta, params, resposta, grafico, con
         <p className={css.resposta} aria-live="polite">{frase}</p>
       </header>
 
-      <div className={css.corpo} data-carregando={carregando} style={{ minHeight: altura ?? 280 }}>
-        {erro ? (
-          <p className={css.erro} role="alert">{erro}</p>
-        ) : linhas && linhas.length > 0 ? (
-          comoTabela ? (
-            <TabelaDados linhas={linhas} colunas={colunas} legenda={titulo} />
-          ) : conteudo ? (
-            conteudo(linhas)
-          ) : (
-            opcao && <Grafico opcao={opcao} rotulo={`${titulo} ${frase}`} formatoDoValor={formatoDoValor} altura={altura} />
-          )
-        ) : null}
-      </div>
+      <Protecao aviso="Este cartão não conseguiu desenhar os dados.">
+        <div className={css.corpo} data-carregando={carregando} style={{ minHeight: altura ?? 280 }}>
+          {erro ? (
+            <p className={css.erro} role="alert">{erro}</p>
+          ) : linhas && linhas.length > 0 ? (
+            comoTabela ? (
+              <TabelaDados linhas={linhas} colunas={colunas} legenda={titulo} />
+            ) : conteudo ? (
+              conteudo(linhas)
+            ) : (
+              opcao && <Grafico opcao={opcao} rotulo={`${titulo} ${frase}`} formatoDoValor={formatoDoValor} altura={altura} />
+            )
+          ) : null}
+        </div>
+      </Protecao>
 
       <footer className={css.acoes}>
         <button type="button" aria-haspopup="dialog" onClick={() => setSqlAberto(true)}>
