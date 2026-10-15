@@ -214,7 +214,7 @@ comment on column auditoria.relatorio_qualidade.regra is 'Regra de tratamento (R
 comment on column auditoria.relatorio_qualidade.origem is 'Arquivo bruto de onde vieram as linhas.';
 comment on column auditoria.relatorio_qualidade.descricao is 'O que a regra fez, em português.';
 comment on column auditoria.relatorio_qualidade.linhas_afetadas is 'Quantas linhas a regra tratou.';
-comment on column auditoria.relatorio_qualidade.acao is 'corrigido, convertido, mesclado, nulo, outro, relatado ou quarentena.';
+comment on column auditoria.relatorio_qualidade.acao is 'corrigido, convertido, mesclado, nulo, outro, relatado, quarentena ou cascata (foi junto com uma linha em quarentena).';
 
 create table auditoria.quarentena (
   id       int primary key,

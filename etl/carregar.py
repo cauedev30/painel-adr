@@ -60,5 +60,8 @@ def gravar_limpos(tabelas: dict[str, pd.DataFrame], registros: list[Registro], q
 
 def montar_banco() -> Path:
     """Roda o script Node que cria o banco no PGlite a partir dos CSVs limpos e salva o banco.tar.gz."""
-    subprocess.run(["node", str(SCRIPT_DO_BANCO)], check=True, cwd=RAIZ)
+    feito = subprocess.run(["node", str(SCRIPT_DO_BANCO)], cwd=RAIZ, capture_output=True, text=True,
+                           encoding="utf-8")
+    if feito.returncode != 0:  # o Postgres recusou algum dado ou o Node falhou: mostra o erro inteiro
+        raise RuntimeError(f"montar-banco.mjs falhou:\n{feito.stdout}{feito.stderr}")
     return ARQ_BANCO

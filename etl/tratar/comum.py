@@ -29,7 +29,7 @@ class Registro:
     origem: str
     descricao: str
     linhas_afetadas: int
-    acao: str  # corrigido, convertido, mesclado, nulo, outro, quarentena
+    acao: str  # corrigido, convertido, mesclado, nulo, outro, relatado, quarentena, cascata
     ids: list[int] = field(default_factory=list)
 
 
@@ -100,7 +100,7 @@ def propagar_quarentena(tabelas: dict[str, pd.DataFrame], quarentena: list[dict]
         ids = sorted(int(q["registro"]["id"]) for q in novos if (q["regra"], q["tabela"]) == (regra, tabela))
         registros.append(Registro(regra, ORIGEM_DA_TABELA[tabela],
                                   f"{tabela.capitalize()} que depende de linha em quarentena (cascata)",
-                                  len(ids), "quarentena", ids))
+                                  len(ids), "cascata", ids))
     return Resultado(t, registros, novos)
 
 
