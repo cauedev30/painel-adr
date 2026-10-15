@@ -24,14 +24,7 @@ jobs:
       - name: Dependências Python
         run: python -m pip install -r requirements.txt
 
-      # D2.12: a semente reproduz os mesmos brutos e o mesmo gabarito em outra máquina
-      # (o .xlsx fica de fora: o openpyxl grava a hora dentro do arquivo)
-      - name: Gerar dados
-        run: python gerar_dados.py && git diff --exit-code -- dados/brutos/*.csv dados/gabarito.json
-
-      - name: Testes do pipeline (pytest)
-        run: python -m pytest
-
+      # o pipeline monta o banco com o PGlite, que roda no Node
       - uses: actions/setup-node@v7
         with:
           node-version: "24"
@@ -41,6 +34,18 @@ jobs:
       - name: Dependências do painel
         working-directory: web
         run: npm ci
+
+      # D2.12: a semente reproduz os mesmos brutos e o mesmo gabarito em outra máquina
+      # (o .xlsx fica de fora: o openpyxl grava a hora dentro do arquivo)
+      - name: Gerar dados
+        run: python gerar_dados.py && git diff --exit-code -- dados/brutos/*.csv dados/gabarito.json
+
+      # ler → tratar → validar → carregar; para o CI se a validação falhar
+      - name: Pipeline
+        run: python pipeline.py
+
+      - name: Testes do pipeline (pytest)
+        run: python -m pytest
 
       - name: Testes do painel (Vitest)
         working-directory: web
