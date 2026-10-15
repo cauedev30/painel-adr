@@ -1,5 +1,7 @@
 # Painel de Dados ADR
 
+[![CI e publicação](https://github.com/cauedev30/painel-adr/actions/workflows/ci-e-publicacao.yml/badge.svg)](https://github.com/cauedev30/painel-adr/actions/workflows/ci-e-publicacao.yml)
+
 > **Projeto conceitual de candidatura · dados simulados.** Não é material oficial da ADR
 > Empreendimentos. Os nomes e fatos públicos dos empreendimentos vêm do site da empresa; todos os
 > números são simulados.
@@ -336,7 +338,7 @@ real, a análise é que descobriria esses padrões.
 - [x] Banco PostgreSQL com DER, views e 30 consultas
 - [x] Painel com 6 telas, "Ver SQL" e console
 - [x] Notebook do pipeline
-- [ ] Publicação automática no GitHub Pages
+- [x] Publicação automática no GitHub Pages, depois de todos os testes
 - [ ] Relatório mensal em Excel para a diretoria
 - [ ] Versão do painel em Power BI, com as medidas em DAX
 
