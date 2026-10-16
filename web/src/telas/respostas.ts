@@ -1,7 +1,7 @@
 // As frases-resposta dos cartões (seção 6.2): calculadas das linhas da consulta, nunca escritas à mão.
 // Funções puras, testadas em web/testes/painel/respostas.test.ts.
 import { MIN_LEADS_CANAL, comArtigo } from '../canais.ts'
-import { type Variacao, inteiro, mes, moedaCompacta, pct, reais, variacao } from '../formatar.ts'
+import { type Variacao, inteiro, mes, moedaCompacta, pct, variacao } from '../formatar.ts'
 import { type Rota, periodoAnterior } from '../navegacao/rotas.ts'
 
 export type MesDeVendas = { mes: string; vendas: number; meta: number; media_movel_3m: number }
@@ -101,18 +101,6 @@ export function respostaRitmo(linhas: LinhaRitmo[]): string {
   const melhor = aos6.reduce((a, b) => (b.pct_vendido > a.pct_vendido ? b : a))
   if (aos6.length === 1) return `Nos 6 primeiros meses, o ${melhor.nome} vendeu ${pct(melhor.pct_vendido, 0)} das unidades`
   return `Nos 6 primeiros meses, o ${melhor.nome} vendeu ${pct(melhor.pct_vendido, 0)} das unidades, o lançamento mais rápido`
-}
-
-export type LinhaCaixa = { empreendimento_id: number; nome: string; minimo: number; q1: number; mediana: number; q3: number; maximo: number; outliers: number[] }
-
-/** As medianas de cada empreendimento e quantas vendas ficaram fora da curva. */
-export function respostaDistribuicao(linhas: LinhaCaixa[]): string {
-  const fora = linhas.reduce((s, l) => s + l.outliers.length, 0)
-  const foraDaCurva = fora === 0 ? 'nenhuma venda fora da curva' : fora === 1 ? '1 venda fora da curva' : `${inteiro(fora)} vendas fora da curva`
-  if (linhas.length === 1) return `Mediana de ${reais(linhas[0].mediana)} por m², e ${foraDaCurva}`
-  const ordem = [...linhas].sort((a, b) => a.mediana - b.mediana)
-  const [menor, maior] = [ordem[0], ordem.at(-1)!]
-  return `A mediana vai de ${reais(menor.mediana)} por m² no ${menor.nome} a ${reais(maior.mediana)} no ${maior.nome}, e ${foraDaCurva}`
 }
 
 // ---- Funil e corretores ----

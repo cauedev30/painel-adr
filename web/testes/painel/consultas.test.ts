@@ -6,6 +6,7 @@ describe('catálogo de consultas do painel', () => {
   // as consultas que saíram do painel ficam só no repositório (a mesma lista do glob em consultas.ts)
   const FORA_DO_PAINEL = [
     'dados/der', 'visao-geral/kpi_preco_m2', 'vendas-estoque/preco_m2_estatisticas', 'vendas-estoque/vista_mar',
+    'vendas-estoque/preco_m2_distribuicao',
     'recebiveis/distratos_e_atraso',
   ]
   const DO_PAINEL = listarConsultas().filter((id) => !id.startsWith('console/') && !FORA_DO_PAINEL.includes(id))

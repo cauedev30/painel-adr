@@ -41,7 +41,7 @@ confiável e transformá-las em resposta para a diretoria.
 | Dashboards interativos | 5 telas com filtros |
 | KPIs | VGV, VSO, estoque, ticket médio, preço/m², inadimplência, conversão do funil |
 | Comunicar insights | A frase-resposta de cada cartão |
-| Estatística descritiva e outliers | Preço/m²: boxplot com mediana, quartis e IQR no painel; média, moda, desvio padrão e percentis no notebook e em `preco_m2_estatisticas.sql` |
+| Estatística descritiva e outliers | Preço/m²: média, mediana, moda, desvio padrão, percentis, quartis e IQR no notebook e em `preco_m2_estatisticas.sql` e `preco_m2_distribuicao.sql` (fora do painel desde o D13) |
 | Python (Pandas, NumPy, Matplotlib) | Pipeline e notebook |
 | PostgreSQL | Banco real (PGlite), `.sql` em Postgres puro |
 | Portfólio no GitHub | Repositório público e site no GitHub Pages |
@@ -71,7 +71,7 @@ Lacunas assumidas e adiadas: planilhas avançadas (xlsx com PROCX) e ferramenta 
 | D9 | ~~O "Ver SQL" mostra o mesmo arquivo `.sql` que o gráfico executa~~ Revogada por D12 | O painel roda o arquivo de `sql/consultas/` tal como está no repositório |
 | D10 | Publicação automática pelo GitHub Actions, bloqueada se qualquer teste falhar | O link enviado nunca quebra por mudança |
 | D11 | Volume ajustado para ≈ 390 unidades e ≈ 280 vendas (antes estimado em 700 e 450) | Só 4 empreendimentos estão à venda; prédios de compactos têm 60 a 140 unidades |
-| D13 | Painel mais intuitivo (2026-10-16): saem o KPI preço/m² e os cartões de estatística do preço/m², de vista mar e de distratos; VGV e VSO ganham o nome por extenso; os filtros viram 2 botões com ícone e resumo, que abrem um painel flutuante (atalhos de período de um clique e a lista de empreendimentos) | Mesma razão do D12: a apresentação ao CEO; menos cartões, termos claros e filtro de um clique |
+| D13 | Painel mais intuitivo (2026-10-16): saem o KPI preço/m² e os cartões do boxplot e da estatística do preço/m², de vista mar e de distratos; VGV e VSO ganham o nome por extenso; os filtros viram 2 botões com ícone e resumo, que abrem um painel flutuante (atalhos de período de um clique e a lista de empreendimentos) | Mesma razão do D12: a apresentação ao CEO; menos cartões, termos claros e filtro de um clique |
 | D12 | Painel enxuto (2026-10-15): saem o "Ver SQL", o tempo da consulta, o Console SQL, o DER da tela Dados e "O que os dados dizem"; fica o "ver como tabela"; o nome sob o logo vira "Inteligência comercial" | A entrevista é presencial, com o CEO da ADR, que não é técnico; o SQL continua no repositório, no README e no notebook |
 
 ## 3. Dados
@@ -226,8 +226,8 @@ faixas, consulta ao catálogo (`information_schema`) para gerar o DER.
    estoque, ticket médio, inadimplência; VGV e VSO com o nome por extenso), cada um com variação contra
    o período anterior (▲/▼ com texto); vendas mensais com a linha da meta.
 2. **Vendas e estoque:** cartão por empreendimento (foto, status, barra vendido × estoque, VSO);
-   ritmo de vendas acumulado desde o lançamento, um gráfico pequeno por empreendimento; boxplot do
-   preço/m² com outliers. (A tabela de estatísticas e a vista mar saíram pelo D13.)
+   ritmo de vendas acumulado desde o lançamento, um gráfico pequeno por empreendimento. (O boxplot e a
+   tabela de estatísticas do preço/m² e a vista mar saíram pelo D13.)
 3. **Funil e corretores:** funil horizontal com conversão entre etapas; leads e conversão por canal;
    ranking de corretores com variação de posição contra o mês anterior.
 4. **Recebíveis:** KPIs (a receber em 12 meses, recebido no mês, inadimplência); previsto × recebido

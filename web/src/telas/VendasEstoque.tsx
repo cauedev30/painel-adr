@@ -2,12 +2,11 @@ import { Cartao } from '../componentes/Cartao.tsx'
 import { FotoEmpreendimento } from '../componentes/FotoEmpreendimento.tsx'
 import { Grafico } from '../componentes/Grafico.tsx'
 import { EMPREENDIMENTOS, STATUS } from '../empreendimentos.ts'
-import { inteiro, moedaCompacta, pct, reais } from '../formatar.ts'
+import { inteiro, moedaCompacta, pct } from '../formatar.ts'
 import { paramsDaRota } from '../navegacao/rotas.ts'
 import { PALETA } from '../tema/paleta.ts'
 import {
-  type LinhaCaixa, type LinhaEmpreendimento, type LinhaRitmo,
-  respostaDistribuicao, respostaEmpreendimentos, respostaRitmo,
+  type LinhaEmpreendimento, type LinhaRitmo, respostaEmpreendimentos, respostaRitmo,
 } from './respostas.ts'
 import css from './Telas.module.css'
 import type { PropsDaTela } from './tipos.ts'
@@ -55,25 +54,6 @@ export function VendasEstoque({ rota }: PropsDaTela) {
         ]}
       />
 
-      <Cartao<LinhaCaixa>
-        id="preco-m2"
-        titulo="Quanto custa o m² em cada empreendimento?"
-        consulta="vendas-estoque/preco_m2_distribuicao"
-        params={params}
-        resposta={respostaDistribuicao}
-        formatoDoValor={reais}
-        altura={260}
-        grafico={(linhas) => graficoDaCaixa(linhas)}
-        colunas={[
-          { chave: 'nome', titulo: 'Empreendimento' },
-          { chave: 'minimo', titulo: 'Mínimo', numerica: true, formato: reais },
-          { chave: 'q1', titulo: 'Q1', numerica: true, formato: reais },
-          { chave: 'mediana', titulo: 'Mediana', numerica: true, formato: reais },
-          { chave: 'q3', titulo: 'Q3', numerica: true, formato: reais },
-          { chave: 'maximo', titulo: 'Máximo', numerica: true, formato: reais },
-          { chave: 'outliers', titulo: 'Fora da curva', formato: (o: number[]) => (o.length === 0 ? 'nenhuma' : o.map(reais).join('; ')) },
-        ]}
-      />
     </div>
   )
 }
@@ -172,36 +152,4 @@ function Ritmo({ linhas }: { linhas: LinhaRitmo[] }) {
       })}
     </ul>
   )
-}
-
-/** Boxplot deitado (o nome cabe no eixo), com as vendas fora da curva como pontos. */
-function graficoDaCaixa(linhas: LinhaCaixa[]) {
-  const nomes = linhas.map((l) => l.nome)
-  const temFora = linhas.some((l) => l.outliers.length > 0)
-  return {
-    grid: { left: 118, right: 16, top: temFora ? 36 : 12, bottom: 40 },
-    legend: temFora ? { top: 0, right: 0, data: ['Vendas do período', 'Fora da curva'] } : undefined,
-    tooltip: {
-      trigger: 'item' as const,
-      formatter: (p: unknown) => {
-        const { seriesType, name, data } = p as { seriesType: string; name: string; data: number[] }
-        if (seriesType === 'scatter') return `${nomes[data[1]]}<br/>fora da curva: <b>${reais(data[0])}</b> por m²`
-        const [, min, q1, med, q3, max] = data
-        return `${name}<br/>máximo ${reais(max)}<br/>Q3 ${reais(q3)}<br/><b>mediana ${reais(med)}</b><br/>Q1 ${reais(q1)}<br/>mínimo ${reais(min)}`
-      },
-    },
-    xAxis: { type: 'value' as const, scale: true, name: 'R$ por m²', nameLocation: 'middle' as const, nameGap: 24, axisLabel: { hideOverlap: true, formatter: (v: number) => `${inteiro(v / 1000)} mil` } },
-    yAxis: { type: 'category' as const, data: nomes, inverse: true },
-    series: [
-      {
-        type: 'boxplot' as const, name: 'Vendas do período', boxWidth: [8, 22],
-        data: linhas.map((l) => [l.minimo, l.q1, l.mediana, l.q3, l.maximo]),
-      },
-      {
-        type: 'scatter' as const, name: 'Fora da curva', symbolSize: 8,
-        itemStyle: { color: PALETA.fundo, borderColor: PALETA.texto, borderWidth: 2 },
-        data: linhas.flatMap((l, i) => l.outliers.map((o) => [o, i])),
-      },
-    ],
-  }
 }

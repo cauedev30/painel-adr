@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
-  KPIS, type LinhaEmpreendimento, type LinhaRanking, canalQueMaisConverte, lerKpi, respostaCanais, respostaDistribuicao, respostaEmpreendimentos, respostaRitmo,
+  KPIS, type LinhaEmpreendimento, type LinhaRanking, canalQueMaisConverte, lerKpi, respostaCanais, respostaEmpreendimentos, respostaRitmo,
   KPIS_RECEBIVEIS, respostaQualidade, textoDaComparacao, respostaFaixas, respostaFunil, respostaInadDesconto, respostaInadEmpreendimento,
   respostaMapaCalor, respostaPrevistoRecebido, respostaRanking, respostaVendasMensais, variacaoDePosicao,
 } from '../../src/telas/respostas.ts'
@@ -91,12 +91,6 @@ describe('frases de Vendas e estoque', () => {
     expect(respostaRitmo([r('Mares A', 1, 0.1), r('Mares A', 2, 0.15)])).toBe('O Mares A vendeu 15% das unidades em 2 meses')
   })
 
-  it('distribuição: medianas e vendas fora da curva', () => {
-    const c = (nome: string, mediana: number, outliers: number[]) => ({ empreendimento_id: 1, nome, minimo: 0, q1: 0, mediana, q3: 0, maximo: 0, outliers })
-    expect(respostaDistribuicao([c('Mares A', 17433.41, []), c('Mares B', 16223.36, [21000])]))
-      .toBe('A mediana vai de R$ 16.223 por m² no Mares B a R$ 17.433 no Mares A, e 1 venda fora da curva')
-    expect(respostaDistribuicao([c('Mares A', 17000, [])])).toBe('Mediana de R$ 17.000 por m², e nenhuma venda fora da curva')
-  })
 })
 
 describe('frases de Funil e corretores', () => {

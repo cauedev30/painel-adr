@@ -1,6 +1,6 @@
 // O catálogo de consultas (D5.3): o texto de cada sql/consultas/<tela>/<cartao>.sql, importado na
 // compilação. Arquivo novo entra no painel sozinho. As consultas que saíram do painel (o console e o
-// DER em 2026-10-15; o preço/m², a vista mar e os distratos em 2026-10-16) ficam só no repositório; a
+// DER em 2026-10-15; o preço/m², a vista mar, o boxplot e os distratos em 2026-10-16) ficam só no repositório; a
 // mesma lista está em testes/painel/consultas.test.ts.
 const ARQUIVOS = import.meta.glob<string>(
   [
@@ -10,6 +10,7 @@ const ARQUIVOS = import.meta.glob<string>(
     '!../../../sql/consultas/visao-geral/kpi_preco_m2.sql',
     '!../../../sql/consultas/vendas-estoque/preco_m2_estatisticas.sql',
     '!../../../sql/consultas/vendas-estoque/vista_mar.sql',
+    '!../../../sql/consultas/vendas-estoque/preco_m2_distribuicao.sql',
     '!../../../sql/consultas/recebiveis/distratos_e_atraso.sql',
   ],
   { query: '?raw', import: 'default', eager: true },
