@@ -1,7 +1,6 @@
 // As frases-resposta dos cartões (seção 6.2): calculadas das linhas da consulta, nunca escritas à mão.
 // Funções puras, testadas em web/testes/painel/respostas.test.ts.
-import { comArtigo } from '../canais.ts'
-import { MIN_LEADS_CANAL } from '../conclusoes.ts'
+import { MIN_LEADS_CANAL, comArtigo } from '../canais.ts'
 import { type Variacao, inteiro, mes, moedaCompacta, pct, reais, variacao } from '../formatar.ts'
 import { type Rota, periodoAnterior } from '../navegacao/rotas.ts'
 
@@ -158,7 +157,7 @@ export function respostaFunil(linhas: LinhaFunil[]): string {
 
 export type LinhaCanal = { canal: string; leads: number; vendas: number; conversao: number }
 
-/** O canal de maior conversão entre os que têm volume (o mesmo critério das conclusões); nulo se nenhum vendeu. */
+/** O canal de maior conversão entre os que têm volume (com pelo menos MIN_LEADS_CANAL leads); nulo se nenhum vendeu. */
 export function canalQueMaisConverte(linhas: LinhaCanal[]): LinhaCanal | null {
   const candidatos = linhas.filter((l) => l.leads >= MIN_LEADS_CANAL && l.vendas > 0)
   return candidatos.length === 0 ? null : candidatos.reduce((a, b) => (b.conversao > a.conversao ? b : a))
@@ -288,12 +287,6 @@ export function respostaDistratos([l]: LinhaDistratos[]): string {
 }
 
 // ---- Dados ----
-
-export function respostaDer(linhas: { tabela: string; fk_tabela: string | null }[]): string {
-  const tabelas = new Set(linhas.map((l) => l.tabela)).size
-  const relacoes = linhas.filter((l) => l.fk_tabela !== null).length
-  return `${inteiro(tabelas)} ${tabelas === 1 ? 'tabela' : 'tabelas'} e ${inteiro(relacoes)} ${relacoes === 1 ? 'relação' : 'relações'}, lidas do catálogo do próprio banco; escolha uma tabela para ver o dicionário`
-}
 
 export type LinhaQualidade = { regra: string; origem: string; descricao: string; linhas_afetadas: number; acao: string }
 

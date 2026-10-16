@@ -1,5 +1,4 @@
 .kpi {
-  position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--esp-1);
@@ -53,25 +52,4 @@
 
 .erro {
   color: var(--atraso-1);
-}
-
-/* "Ver SQL" discreto no canto, para não competir com o número */
-.sql {
-  position: absolute;
-  top: var(--esp-3);
-  right: var(--esp-3);
-  display: inline-flex;
-  align-items: center;
-  gap: var(--esp-1);
-  padding: 2px var(--esp-2);
-  background: none;
-  border: 1px solid transparent;
-  border-radius: var(--raio-pequeno);
-  color: var(--texto-2);
-  font-size: 0.75rem;
-}
-
-.sql:hover {
-  color: var(--texto);
-  border-color: var(--borda);
 }

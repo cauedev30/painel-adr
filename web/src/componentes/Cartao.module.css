@@ -9,7 +9,7 @@
   scroll-margin-top: var(--esp-5);
 }
 
-/* o cartão aberto por um link das conclusões recebe o foco e ganha a borda em cobre */
+/* o cartão aberto por um link (#<id>) recebe o foco e ganha a borda em cobre */
 .cartao:focus {
   outline: none;
   border-color: var(--cobre);
@@ -74,12 +74,6 @@
 .acoes button[aria-pressed='true'] {
   color: var(--texto);
   border-color: var(--texto-2);
-}
-
-.tempo {
-  margin-left: auto;
-  font-size: var(--tamanho-pequeno);
-  color: var(--texto-2);
 }
 
 @media (max-width: 899px) {

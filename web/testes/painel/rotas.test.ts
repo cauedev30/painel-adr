@@ -4,8 +4,8 @@ import {
 } from '../../src/navegacao/rotas.ts'
 
 describe('as telas', () => {
-  it('são 6, com ids únicos, e a primeira é a visão geral', () => {
-    expect(TELAS.map((t) => t.id)).toEqual(['visao-geral', 'vendas-estoque', 'funil-corretores', 'recebiveis', 'dados', 'console'])
+  it('são 5, com ids únicos, e a primeira é a visão geral', () => {
+    expect(TELAS.map((t) => t.id)).toEqual(['visao-geral', 'vendas-estoque', 'funil-corretores', 'recebiveis', 'dados'])
     expect(TELAS.every((t) => t.nome && t.icone)).toBe(true)
   })
 })
@@ -14,7 +14,7 @@ describe('lerHash e escreverHash', () => {
   it.each([
     '#/visao-geral?de=2025-10&ate=2026-09',
     '#/recebiveis?de=2026-01&ate=2026-09&emp=2',
-    '#/console?de=2025-10&ate=2026-09&consulta=visao-geral%2Fvendas_mensais',
+    '#/dados?de=2025-10&ate=2026-09',
   ])('ida e volta: %s', (hash) => {
     expect(escreverHash(lerHash(hash))).toBe(hash)
   })
@@ -28,6 +28,8 @@ describe('lerHash e escreverHash', () => {
 
   it('tela desconhecida volta à visão geral e mantém os filtros', () => {
     expect(lerHash('#/nada?de=2026-01&ate=2026-03&emp=3')).toMatchObject({ tela: 'visao-geral', de: '2026-01', ate: '2026-03', emp: 3 })
+    // o console saiu do painel; um link antigo abre a visão geral
+    expect(lerHash('#/console?de=2026-01&ate=2026-03')).toMatchObject({ tela: 'visao-geral', de: '2026-01', ate: '2026-03' })
   })
 
   it('valor inválido volta ao padrão', () => {
@@ -42,7 +44,7 @@ describe('lerHash e escreverHash', () => {
   })
 
   it('guarda os outros parâmetros em extra', () => {
-    expect(lerHash('#/console?consulta=dados%2Fder').extra).toEqual({ consulta: 'dados/der' })
+    expect(lerHash('#/recebiveis?cartao=distratos').extra).toEqual({ cartao: 'distratos' })
   })
 })
 

@@ -2,14 +2,13 @@
 // Assim o link com filtro pode ser compartilhado, e o GitHub Pages não dá 404 ao recarregar a página.
 import { EMPREENDIMENTOS } from '../empreendimentos.ts'
 
-// filtros: a tela tem cartões que mudam com o período e o empreendimento (Dados e Console não têm)
+// filtros: a tela tem cartões que mudam com o período e o empreendimento (Dados não tem)
 export const TELAS = [
   { id: 'visao-geral', nome: 'Visão geral', icone: 'painel', filtros: true },
   { id: 'vendas-estoque', nome: 'Vendas e estoque', icone: 'predio', filtros: true },
   { id: 'funil-corretores', nome: 'Funil e corretores', icone: 'funil', filtros: true },
   { id: 'recebiveis', nome: 'Recebíveis', icone: 'moeda', filtros: true },
   { id: 'dados', nome: 'Dados', icone: 'banco', filtros: false },
-  { id: 'console', nome: 'Console SQL', icone: 'terminal', filtros: false },
 ] as const
 
 export type IdTela = (typeof TELAS)[number]['id']

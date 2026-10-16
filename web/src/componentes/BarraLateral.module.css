@@ -30,10 +30,8 @@
 }
 
 .subtitulo {
-  font-family: var(--fonte-titulo);
-  font-size: 0.6875rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font-family: var(--fonte-texto);
+  font-size: 0.8125rem;
   color: var(--texto-2);
 }
 

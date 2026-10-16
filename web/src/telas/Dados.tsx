@@ -1,64 +1,18 @@
-import { useState } from 'react'
-import ddl from '../../../sql/01_schema.sql?raw'
 import { Cartao } from '../componentes/Cartao.tsx'
-import { CodigoSql } from '../componentes/CodigoSql.tsx'
-import { Diagrama } from '../componentes/Diagrama.tsx'
-import { type LinhaDer, colunasDaTabela, gerarDer, nomeDaEntidade, tabelasDoDer } from '../der.ts'
 import { inteiro } from '../formatar.ts'
 import { paramsDaRota } from '../navegacao/rotas.ts'
 import { ACOES, REGRAS } from '../regras.ts'
-import { type LinhaQualidade, respostaDer, respostaQualidade } from './respostas.ts'
+import { type LinhaQualidade, respostaQualidade } from './respostas.ts'
 import css from './Telas.module.css'
 import type { PropsDaTela } from './tipos.ts'
 
-// O modelo conceitual (D6.4), escrito à mão a partir da seção 3.3 da spec: as entidades e o que as liga,
-// sem tipo nem chave
-const CONCEITUAL = `flowchart LR
-  E[Empreendimento] -- tem --> U[Unidade]
-  E -- tem --> M[Meta mensal]
-  I[Imobiliária] -- reúne --> C[Corretor]
-  L[Lead] -- se interessa por --> E
-  C -- atende --> L
-  L -- vira no máximo um --> CL[Cliente]
-  U -- é vendida em --> V[Venda]
-  CL -- compra em --> V
-  C -- fecha --> V
-  V -- gera --> P[Parcela]
-  P -- recebe --> PG[Pagamento]`
-
-const ABAS = [
-  { id: 'conceitual', nome: 'Conceitual' },
-  { id: 'logico', nome: 'Lógico' },
-  { id: 'fisico', nome: 'Físico (DDL)' },
-] as const
-
-type Aba = (typeof ABAS)[number]['id']
-
+// A tela Dados mostra o que a limpeza fez e o que é real ou simulado. O modelo do banco (DER, dicionário
+// e DDL) saiu do painel em 2026-10-15 e fica no repositório: sql/01_schema.sql e o README.
 export function Dados({ rota }: PropsDaTela) {
   const params = paramsDaRota(rota)
 
   return (
     <div className={css.tela}>
-      <Cartao<LinhaDer>
-        id="der"
-        titulo="Como o banco é organizado?"
-        consulta="dados/der"
-        params={params}
-        resposta={respostaDer}
-        altura={420}
-        conteudo={(linhas) => <Modelos linhas={linhas} />}
-        nomeDoConteudo="diagrama"
-        colunas={[
-          { chave: 'tabela', titulo: 'Tabela' },
-          { chave: 'coluna', titulo: 'Coluna' },
-          { chave: 'tipo', titulo: 'Tipo' },
-          { chave: 'nulo', titulo: 'Aceita nulo', formato: (v: boolean) => (v ? 'sim' : 'não') },
-          { chave: 'pk', titulo: 'Chave primária', formato: (v: boolean) => (v ? 'sim' : '') },
-          { chave: 'fk_tabela', titulo: 'Referencia', formato: (v: string | null) => v ?? '' },
-          { chave: 'comentario', titulo: 'Dicionário', formato: (v: string | null) => v ?? '' },
-        ]}
-      />
-
       <Cartao<LinhaQualidade>
         id="qualidade"
         titulo="Que problemas os dados tinham, e o que o pipeline fez?"
@@ -77,100 +31,6 @@ export function Dados({ rota }: PropsDaTela) {
       />
 
       <RealSimulado />
-    </div>
-  )
-}
-
-/** As abas dos três níveis de modelagem; o lógico é o DER clicável, com a lista de tabelas ao lado. */
-function Modelos({ linhas }: { linhas: LinhaDer[] }) {
-  const [aba, setAba] = useState<Aba>('logico')
-  const tabelas = tabelasDoDer(linhas)
-  const [tabela, setTabela] = useState<string>(tabelas.find((t) => t === 'adr.venda') ?? tabelas[0])
-  const der = gerarDer(linhas)
-
-  function teclado(e: React.KeyboardEvent) {
-    const i = ABAS.findIndex((a) => a.id === aba)
-    const proxima = e.key === 'ArrowRight' ? i + 1 : e.key === 'ArrowLeft' ? i - 1 : null
-    if (proxima === null) return
-    const nova = ABAS[(proxima + ABAS.length) % ABAS.length].id
-    setAba(nova)
-    document.getElementById(`aba-${nova}`)?.focus()
-  }
-
-  return (
-    <div className={css.modelos}>
-      <div role="tablist" aria-label="Nível do modelo" className={css.abas} onKeyDown={teclado}>
-        {ABAS.map((a) => (
-          <button key={a.id} id={`aba-${a.id}`} type="button" role="tab" aria-selected={aba === a.id}
-            aria-controls={`painel-${a.id}`} tabIndex={aba === a.id ? 0 : -1} onClick={() => setAba(a.id)}>
-            {a.nome}
-          </button>
-        ))}
-      </div>
-
-      <div id={`painel-${aba}`} role="tabpanel" aria-labelledby={`aba-${aba}`} className={css.painelAba}>
-        {aba === 'conceitual' && (
-          <>
-            <p className={css.notaAba}>O que existe no negócio e como se liga, sem tipo nem chave.</p>
-            <Diagrama texto={CONCEITUAL} rotulo="Modelo conceitual: empreendimento tem unidades e metas; imobiliária reúne corretores; corretor atende leads; lead vira no máximo um cliente; a venda liga unidade, cliente e corretor; a venda gera parcelas, e a parcela recebe pagamentos." />
-          </>
-        )}
-        {aba === 'logico' && (
-          <div className={css.derComLista}>
-            <div>
-              <p className={css.notaAba}>Gerado do catálogo do banco (pg_catalog): clique numa tabela.</p>
-              <Diagrama alto texto={der} rotulo={`Diagrama entidade-relacionamento com ${tabelas.length} tabelas.`}
-                selecionada={nomeDaEntidade(tabela)}
-                aoClicar={(entidade) => setTabela(tabelas.find((t) => nomeDaEntidade(t) === entidade) ?? tabela)} />
-            </div>
-            <Dicionario linhas={linhas} tabelas={tabelas} tabela={tabela} aoEscolher={setTabela} />
-          </div>
-        )}
-        {aba === 'fisico' && (
-          <>
-            <p className={css.notaAba}>O <code>sql/01_schema.sql</code> que o pipeline roda para criar o banco, com o dicionário em <code>comment on</code>.</p>
-            <CodigoSql sql={ddl} className={css.ddl} />
-          </>
-        )}
-      </div>
-    </div>
-  )
-}
-
-/** A lista de tabelas (o caminho pelo teclado, D6.3) e as colunas da escolhida, com o dicionário. */
-function Dicionario({ linhas, tabelas, tabela, aoEscolher }: { linhas: LinhaDer[]; tabelas: string[]; tabela: string; aoEscolher: (t: string) => void }) {
-  const colunas = colunasDaTabela(linhas, tabela)
-  return (
-    <div className={css.dicionario}>
-      <label className={css.escolhaTabela}>
-        <span>Tabela</span>
-        <select value={tabela} onChange={(e) => aoEscolher(e.target.value)}>
-          {tabelas.map((t) => <option key={t} value={t}>{t}</option>)}
-        </select>
-      </label>
-      <table className={css.colunas} aria-live="polite">
-        <caption className="so-leitor">Colunas de {tabela}</caption>
-        <thead>
-          <tr><th scope="col">Coluna</th><th scope="col">Tipo</th><th scope="col">O que é</th></tr>
-        </thead>
-        <tbody>
-          {colunas.map((c) => (
-            <tr key={c.coluna}>
-              <th scope="row">
-                {/* o nome longo só quebra depois de um "_" (data_venda → data_ / venda) */}
-                <code>{c.coluna.split('_').map((parte, i, partes) => <span key={i}>{parte}{i < partes.length - 1 && <>_<wbr /></>}</span>)}</code>
-                {c.pk && <span className={css.chave}>PK</span>}
-                {c.fk_tabela && <span className={css.chave} title={`referencia ${c.fk_tabela}.${c.fk_coluna}`}>FK</span>}
-              </th>
-              <td><code>{c.tipo}</code>{c.nulo ? '' : <span className={css.obrigatoria}> não nulo</span>}</td>
-              <td>
-                {c.comentario ?? '—'}
-                {c.fk_tabela && <span className={css.referencia}> → {c.fk_tabela}.{c.fk_coluna}</span>}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
     </div>
   )
 }

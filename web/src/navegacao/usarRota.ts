@@ -12,7 +12,7 @@ function hashAtual(): string {
 
 /**
  * A rota atual, lida do hash, e `navegar(mudanca)`, que escreve no hash só o que muda. Trocar de tela
- * mantém os filtros; o `extra` (ex.: a consulta aberta no console) só vale para a tela em que nasceu.
+ * mantém os filtros; o `extra` (ex.: o cartão em foco) só vale para a tela em que nasceu.
  */
 export function usarRota(): [Rota, (mudanca: Partial<Rota>) => void] {
   const hash = useSyncExternalStore(assinar, hashAtual)
@@ -29,7 +29,7 @@ export function usarRota(): [Rota, (mudanca: Partial<Rota>) => void] {
 }
 
 /**
- * O link de uma conclusão (`?cartao=<id>`) abre a tela já no cartão: rola até ele e põe o foco nele,
+ * O link de um cartão (`?cartao=<id>`, feito por `linkDoCartao`) abre a tela já no cartão: rola até ele e põe o foco nele,
  * para o teclado e o leitor de tela continuarem dali.
  */
 export function usarCartaoEmFoco(rota: Rota, pronto: boolean): void {

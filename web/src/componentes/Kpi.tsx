@@ -1,10 +1,7 @@
-import { useState } from 'react'
 import type { Param } from '../banco/cliente.ts'
 import { usarConsulta } from '../banco/usarConsulta.ts'
 import { type DefinicaoKpi, type LinhaKpi, lerKpi } from '../telas/respostas.ts'
-import { Icone } from './Icone.tsx'
 import css from './Kpi.module.css'
-import { PainelSql } from './PainelSql.tsx'
 
 type Props = {
   kpi: DefinicaoKpi
@@ -21,7 +18,6 @@ const PALAVRA_DO_TOM = { bom: 'melhorou', ruim: 'piorou', neutro: 'sem mudança'
  */
 export function Kpi({ kpi, params, periodoAnterior }: Props) {
   const { linhas, erro, carregando } = usarConsulta<LinhaKpi>(kpi.consulta, params)
-  const [sqlAberto, setSqlAberto] = useState(false)
   const leitura = linhas?.[0] ? lerKpi(kpi, linhas[0]) : null
 
   return (
@@ -46,11 +42,6 @@ export function Kpi({ kpi, params, periodoAnterior }: Props) {
           </p>
         </>
       )}
-      <button type="button" className={css.sql} aria-haspopup="dialog" onClick={() => setSqlAberto(true)}>
-        <Icone nome="codigo" tamanho={14} />
-        <span>Ver SQL<span className="so-leitor"> de {kpi.titulo}</span></span>
-      </button>
-      <PainelSql id={kpi.consulta} params={params} aberto={sqlAberto} aoFechar={() => setSqlAberto(false)} />
     </article>
   )
 }

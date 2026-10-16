@@ -35,12 +35,12 @@ confiável e transformá-las em resposta para a diretoria.
 
 | Item da vaga | Onde aparece |
 |---|---|
-| Interpretar modelagem e DER | Tela Dados: DER gerado do catálogo do banco, modelos conceitual, lógico e físico, dicionário |
-| SQL (intermediário a avançado, window functions) | "Ver SQL" em todo gráfico, console SQL, `sql/consultas/` |
+| Interpretar modelagem e DER | `sql/01_schema.sql` com o dicionário em `comment on`, o DER no README e a consulta `dados/der.sql` ao catálogo |
+| SQL (intermediário a avançado, window functions) | `sql/consultas/`, no README e no repositório |
 | Tratamento, limpeza e validação | Pipeline em Python, relatório de qualidade, quarentena, testes contra o gabarito |
-| Dashboards interativos | 6 telas com filtros |
+| Dashboards interativos | 5 telas com filtros |
 | KPIs | VGV, VSO, estoque, ticket médio, preço/m², inadimplência, conversão do funil |
-| Comunicar insights | "O que os dados dizem" e a frase-resposta de cada cartão |
+| Comunicar insights | A frase-resposta de cada cartão |
 | Estatística descritiva e outliers | Preço/m²: média, mediana, moda, desvio padrão, percentis, boxplot e IQR |
 | Python (Pandas, NumPy, Matplotlib) | Pipeline e notebook |
 | PostgreSQL | Banco real (PGlite), `.sql` em Postgres puro |
@@ -51,9 +51,9 @@ Lacunas assumidas e adiadas: planilhas avançadas (xlsx com PROCX) e ferramenta 
 
 ### O que é sucesso
 
-- Um recrutador abre o link, entende em 10 segundos o que está vendo e consegue ir de qualquer número
-  até o SQL que o produziu.
-- Todo número do painel é reproduzível: mesma semente, mesmo resultado; o SQL mostrado é o que roda.
+- Um recrutador (ou o CEO da ADR, que não é técnico) abre o link e entende em 10 segundos o que está
+  vendo; quem quiser o SQL de um número o acha em `sql/consultas/<tela>/<cartao>.sql`.
+- Todo número do painel é reproduzível: mesma semente, mesmo resultado.
 - O tratamento é comprovado por teste: o pipeline recupera a verdade que foi sujada.
 
 ## 2. Decisões
@@ -68,9 +68,10 @@ Lacunas assumidas e adiadas: planilhas avançadas (xlsx com PROCX) e ferramenta 
 | D6 | Repositório público `cauedev30/painel-adr` e site em `cauedev30.github.io/painel-adr` | Diferencial "portfólio no GitHub"; link para enviar ao recrutador |
 | D7 | Marca ADR (logo, cores, nomes) com selo "Projeto conceitual de candidatura · dados simulados" e "por Cauê Franco" com link para o repositório | Feito para a ADR, sem parecer dado vazado nem uso oficial da marca |
 | D8 | Só tema escuro | É a identidade da ADR; um tema claro dobraria o acabamento |
-| D9 | O "Ver SQL" mostra o mesmo arquivo `.sql` que o gráfico executa | Nunca mostrar uma consulta e rodar outra |
+| D9 | ~~O "Ver SQL" mostra o mesmo arquivo `.sql` que o gráfico executa~~ Revogada por D12 | O painel roda o arquivo de `sql/consultas/` tal como está no repositório |
 | D10 | Publicação automática pelo GitHub Actions, bloqueada se qualquer teste falhar | O link enviado nunca quebra por mudança |
 | D11 | Volume ajustado para ≈ 390 unidades e ≈ 280 vendas (antes estimado em 700 e 450) | Só 4 empreendimentos estão à venda; prédios de compactos têm 60 a 140 unidades |
+| D12 | Painel enxuto (2026-10-15): saem o "Ver SQL", o tempo da consulta, o Console SQL, o DER da tela Dados e "O que os dados dizem"; fica o "ver como tabela"; o nome sob o logo vira "Inteligência comercial" | A entrevista é presencial, com o CEO da ADR, que não é técnico; o SQL continua no repositório, no README e no notebook |
 
 ## 3. Dados
 
@@ -222,8 +223,7 @@ faixas, consulta ao catálogo (`information_schema`) para gerar o DER.
 
 1. **Visão geral:** faixa com foto noturna de um Mares; 6 KPIs grandes (VGV vendido, VSO, estoque,
    ticket médio, preço/m², inadimplência), cada um com variação contra o mês anterior (▲/▼ com texto);
-   vendas mensais com a linha da meta; "O que os dados dizem", com 4 a 5 conclusões numeradas, cada
-   uma com link para o gráfico que a comprova.
+   vendas mensais com a linha da meta.
 2. **Vendas e estoque:** cartão por empreendimento (foto, status, barra vendido × estoque, VSO);
    ritmo de vendas acumulado desde o lançamento, um gráfico pequeno por empreendimento; boxplot do
    preço/m² com outliers e tabela de média, mediana, moda, desvio padrão, P25, P50, P75 e P90, com "?"
@@ -232,22 +232,16 @@ faixas, consulta ao catálogo (`information_schema`) para gerar o DER.
    ranking de corretores com variação de posição contra o mês anterior.
 4. **Recebíveis:** KPIs (a receber em 12 meses, recebido no mês, inadimplência); previsto × recebido
    por mês; saldo por faixa de atraso; mapa de calor empreendimento × faixa.
-5. **Dados:** DER clicável gerado do catálogo do banco (clique mostra colunas e dicionário); abas
-   conceitual, lógico e físico (DDL); relatório de qualidade em cartões "antes → depois"; o que é real
-   e o que é simulado.
-6. **Console SQL:** editor (CodeMirror, Postgres) em cima e resultado em tabela embaixo; exemplos
-   prontos na lateral; lista de tabelas e colunas; botão "Restaurar banco".
+5. **Dados:** relatório de qualidade em cartões "antes → depois"; o que é real e o que é simulado.
+   (O DER e o Console SQL saíram do painel pelo D12; os `.sql` deles ficam no repositório.)
 
 ### 6.2 Componentes comuns
 
-- **Cartão:** título-pergunta, frase-resposta calculada dos dados, gráfico e ações ("Ver SQL", "ver
-  como tabela").
-- **Ver SQL:** painel lateral com a consulta formatada, os parâmetros em uso, "copiar" e "abrir no
-  console" (abre o console com a consulta e os parâmetros já preenchidos).
+- **Cartão:** título-pergunta, frase-resposta calculada dos dados, gráfico e "ver como tabela".
 - **Filtros:** período e empreendimento, numa linha só no topo; valem para todos os cartões da tela.
+  Rótulo em Lexend Deca, letra normal; caixa lisa, com o cobre só no hover e no foco.
 - **Balão ao passar o mouse:** valor exato em formato brasileiro (R$ 12,4 mi; 8,1%; 30/09/2026).
 - **Tela de carregamento:** logo ADR e "Carregando o banco PostgreSQL no seu navegador…".
-- **Restaurar banco:** recarrega o banco original; cada visitante tem a própria cópia.
 
 ### 6.3 Identidade visual
 
@@ -261,10 +255,10 @@ faixas, consulta ao catálogo (`information_schema`) para gerar o DER.
   claro em 1–30 ao mais intenso em mais de 90), com rótulo e ícone, nunca só a cor; um eixo por
   gráfico; legenda sempre que houver 2 séries ou mais. Toda paleta passa pelo validador da skill
   `dataviz` contra a superfície escura antes de entrar.
-- **Estrutura:** barra lateral (logo ADR, as 6 telas e, no rodapé, o selo "Projeto conceitual de
+- **Estrutura:** barra lateral (logo ADR com "Inteligência comercial", as 5 telas e, no rodapé, o selo "Projeto conceitual de
   candidatura · dados simulados" e "por Cauê Franco", com link para https://github.com/cauedev30/painel-adr);
   faixa superior com o nome da tela, os filtros e "dados até 30/09/2026".
-- **Celular:** tudo empilha e continua legível; o console avisa que funciona melhor no computador.
+- **Celular:** tudo empilha e continua legível.
 - **Acessibilidade:** contraste AA no texto; foco visível; navegação por teclado; tabela por gráfico.
 
 ## 7. Arquitetura e stack
@@ -297,13 +291,10 @@ painel-adr/
 | PostgreSQL (PGlite) | O banco, no build e no navegador | D2 |
 | React + Vite + TypeScript | O painel | Site rápido e estático, sem servidor |
 | ECharts | Gráficos | Boxplot, funil e mapa de calor prontos; tema próprio |
-| CodeMirror | Editor do console | Sintaxe do Postgres e autocompletar |
-| Mermaid | DER | Diagrama a partir de texto, gerado do catálogo do banco |
 | Vitest | Testes das consultas | Roda os `.sql` no PGlite em Node |
 
-Versões conferidas em 2026-10-14: Python 3.12.7, Pandas 3.0.5, NumPy 2.5.2, Node 24.18; PGlite 0.5.9,
-React 19.3, Vite 8.3, ECharts 6.1, Mermaid 12.2, Vitest 5.0, `@codemirror/lang-sql` 6.10,
-`@fontsource/lexend-zetta` e `@fontsource/lexend-deca` 5.3. Faker, pytest e Jupyter entram pelo
+Versões conferidas em 2026-10-14 (CodeMirror e Mermaid saíram com o D12): Python 3.12.7, Pandas 3.0.5, NumPy 2.5.2, Node 24.18; PGlite 0.5.9,
+React 19.3, Vite 8.3, ECharts 6.1, Vitest 5.0, `@fontsource/lexend-zetta` e `@fontsource/lexend-deca` 5.3. Faker, pytest e Jupyter entram pelo
 `requirements.txt`.
 
 O PGlite roda num Web Worker para a tela não travar enquanto uma consulta executa. A versão do PGlite
@@ -322,13 +313,12 @@ Metas de desempenho: primeira abertura em até 5 s numa conexão comum; cada con
    etapas; gera `web/public/banco.tar.gz`.
 3. `npm test` em `web/` → verde. Cada `.sql` de `sql/consultas/` roda no banco gerado e respeita
    invariantes: VGV por empreendimento soma o VGV total; faixas de atraso somam o vencido em aberto;
-   funil é decrescente; cada conclusão de "O que os dados dizem" é verdadeira nos dados (exemplo: o
-   canal citado como de maior conversão é de fato o maior).
+   funil é decrescente; os padrões plantados aparecem nos dados (exemplo: o canal de maior conversão
+   não é o que traz mais leads).
 4. `npm run build` → sem erro.
-5. Checagem no navegador (`npm run preview`): as 6 telas abrem com dados; trocar filtro muda os
-   números; "Ver SQL" mostra o arquivo da consulta e "abrir no console" roda a mesma consulta; o
-   console executa um `SELECT` e o "Restaurar banco" desfaz um `DROP TABLE`; nenhum erro no console
-   do navegador; leitura conferida em 390 px de largura.
+5. Checagem no navegador (`npm run preview`): as 5 telas abrem com dados; trocar filtro muda os
+   números; "ver como tabela" mostra os números do cartão; nenhum erro no console do navegador;
+   leitura conferida em 390 px de largura.
 6. Notebook executa do zero: `jupyter nbconvert --to notebook --execute notebooks/tour-do-pipeline.ipynb`.
 7. GitHub Actions verde no último commit da `main`, e `https://cauedev30.github.io/painel-adr/`
    responde 200 com a versão desse commit.

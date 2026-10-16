@@ -7,7 +7,6 @@ import { FaixaSuperior } from './componentes/FaixaSuperior.tsx'
 import { Protecao } from './componentes/Protecao.tsx'
 import type { IdTela } from './navegacao/rotas.ts'
 import { usarCartaoEmFoco, usarRota } from './navegacao/usarRota.ts'
-import { Console } from './telas/Console.tsx'
 import { Dados } from './telas/Dados.tsx'
 import { FunilCorretores } from './telas/FunilCorretores.tsx'
 import { Recebiveis } from './telas/Recebiveis.tsx'
@@ -21,7 +20,6 @@ const TELAS: Record<IdTela, ComponentType<PropsDaTela>> = {
   'funil-corretores': FunilCorretores,
   recebiveis: Recebiveis,
   dados: Dados,
-  console: Console,
 }
 
 export function App() {

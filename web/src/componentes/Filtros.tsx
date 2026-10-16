@@ -7,7 +7,7 @@ import { Icone } from './Icone.tsx'
 
 type Props = { rota: Rota; navegar: (mudanca: Partial<Rota>) => void }
 
-/** Um select sem a seta do navegador: a seta é um traço fino em cobre, desenhado por cima. */
+/** Um select sem a seta do navegador: a seta é um traço fino, desenhado por cima. */
 function Seletor({ rotulo, valor, aoMudar, children }: {
   rotulo: string; valor: string; aoMudar: (valor: string) => void; children: ReactNode
 }) {
@@ -19,7 +19,8 @@ function Seletor({ rotulo, valor, aoMudar, children }: {
   )
 }
 
-const opcoesDeMes = MESES_DOS_DADOS.map((m) => <option key={m} value={m}>{mes(m)}</option>)
+// no filtro o mês sai como "out 2025": sem a barra, a leitura fica mais limpa
+const opcoesDeMes = MESES_DOS_DADOS.map((m) => <option key={m} value={m}>{mes(m).replace('/', ' ')}</option>)
 
 /** Período (de, até) numa peça só e o empreendimento; cada mudança vai para o hash da URL. */
 export function Filtros({ rota, navegar }: Props) {
@@ -29,7 +30,7 @@ export function Filtros({ rota, navegar }: Props) {
         <legend className={css.rotulo}>Período</legend>
         <div className={css.caixa}>
           <Seletor rotulo="De" valor={rota.de} aoMudar={(de) => navegar({ de })}>{opcoesDeMes}</Seletor>
-          <span className={css.traco} aria-hidden="true">—</span>
+          <span className={css.traco} aria-hidden="true">→</span>
           <Seletor rotulo="Até" valor={rota.ate} aoMudar={(ate) => navegar({ ate })}>{opcoesDeMes}</Seletor>
         </div>
       </fieldset>

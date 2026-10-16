@@ -1,6 +1,5 @@
-import { nomeDoCanal } from '../canais.ts'
+import { MIN_LEADS_CANAL, nomeDoCanal } from '../canais.ts'
 import { Cartao } from '../componentes/Cartao.tsx'
-import { MIN_LEADS_CANAL } from '../conclusoes.ts'
 import { Grafico } from '../componentes/Grafico.tsx'
 import { inteiro, moedaCompacta, pct } from '../formatar.ts'
 import { paramsDaRota } from '../navegacao/rotas.ts'

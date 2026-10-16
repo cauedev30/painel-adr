@@ -1,6 +1,5 @@
 import faixa from '../assets/faixa-noturna.webp'
 import { Cartao } from '../componentes/Cartao.tsx'
-import { Conclusoes } from '../componentes/Conclusoes.tsx'
 import { Kpi } from '../componentes/Kpi.tsx'
 import { inteiro, mes } from '../formatar.ts'
 import { paramsDaRota } from '../navegacao/rotas.ts'
@@ -65,8 +64,6 @@ export function VisaoGeral({ rota }: PropsDaTela) {
           { chave: 'media_movel_3m', titulo: 'Média móvel de 3 meses', numerica: true, formato: umaCasa },
         ]}
       />
-
-      <Conclusoes rota={rota} params={params} />
     </div>
   )
 }

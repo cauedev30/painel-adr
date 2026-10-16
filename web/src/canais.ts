@@ -1,3 +1,6 @@
+/** Canal com menos leads que isso não entra na disputa da maior conversão: 2 vendas em 5 leads não é padrão. */
+export const MIN_LEADS_CANAL = 30
+
 // Os canais de entrada dos leads, como estão no banco (adr.lead.canal), com o nome e o artigo que as
 // frases usam: "o Instagram traz…", "a indicação converte…".
 export const NOMES_DOS_CANAIS: Record<string, { nome: string; artigo: 'o' | 'a' }> = {

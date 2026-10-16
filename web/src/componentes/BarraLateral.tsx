@@ -17,7 +17,7 @@ export function BarraLateral({ rota }: { rota: Rota }) {
       <div className={css.topo}>
         <a className={css.marca} href={escreverHash({ ...rota, tela: 'visao-geral', extra: {} })} aria-label="ADR Empreendimentos, visão geral">
           <img src={logo} alt="" width={120} height={50} />
-          <span className={css.subtitulo}>Painel de dados</span>
+          <span className={css.subtitulo}>Inteligência comercial</span>
         </a>
         <button type="button" className={css.botaoMenu} aria-expanded={aberto} aria-controls="menu-telas"
           onClick={() => setAberto((a) => !a)}>

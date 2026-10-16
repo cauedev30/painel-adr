@@ -13,7 +13,7 @@ vêm os compradores? O dinheiro das parcelas está entrando?**
 
 Para responder, junta o que vem de três sistemas que não conversam (CRM, planilha do comercial e ERP
 financeiro), trata e valida esses dados em Python, guarda tudo num banco PostgreSQL e mostra as
-respostas num painel em que todo número leva ao SQL que o produziu.
+respostas num painel feito para quem decide. O SQL de cada número está em [`sql/consultas/`](sql/consultas).
 
 **Site:** https://cauedev30.github.io/painel-adr/ (o banco roda no navegador; não há nada para instalar)
 
@@ -56,8 +56,7 @@ respostas num painel em que todo número leva ao SQL que o produziu.
 ```
 
 Não há servidor: o pipeline monta o banco uma vez, e o navegador de quem abre o site baixa esse banco e
-roda as consultas localmente. Cada visitante tem a própria cópia, então o console SQL pode até apagar
-tabelas sem afetar ninguém.
+roda as consultas localmente.
 
 ## Stack
 
@@ -70,14 +69,13 @@ tabelas sem afetar ninguém.
 ### Banco
 - PostgreSQL rodando em WebAssembly pelo PGlite 0.5.9: o mesmo banco no build (Node) e no navegador
 - SQL puro, que roda em qualquer Postgres (psql, pgAdmin, DBeaver)
-- `comment on` em toda tabela e coluna: é o dicionário de dados que a tela Dados mostra
+- `comment on` em toda tabela e coluna: o dicionário de dados mora no próprio banco
 
 ### Painel
 - React 19, TypeScript 6 e Vite 8
 - ECharts 6 nos gráficos (boxplot, funil, mapa de calor), com um destaque em cobre e o resto em cinza
-- CodeMirror 6 no console SQL e Mermaid 12 no DER da tela Dados
 - Vitest 5: cada consulta roda no banco gerado e precisa respeitar invariantes (o funil é decrescente,
-  as faixas de atraso somam o vencido em aberto, cada conclusão do painel é verdadeira nos dados)
+  as faixas de atraso somam o vencido em aberto, os padrões plantados aparecem nos dados)
 
 ### Publicação
 - GitHub Actions: gera os dados, roda o pipeline e todos os testes e só então publica
@@ -86,8 +84,8 @@ tabelas sem afetar ninguém.
 ## Banco de dados
 
 10 tabelas no schema `adr` e 2 no schema `auditoria`, em [`sql/01_schema.sql`](sql/01_schema.sql). O
-diagrama mostra as chaves; o DER completo, com todas as colunas e o dicionário, está na tela Dados do
-painel.
+diagrama mostra as chaves; as colunas e o dicionário estão no próprio schema (`comment on`) e saem da
+consulta [`der.sql`](sql/consultas/dados/der.sql), que lê o catálogo do banco.
 
 ```mermaid
 erDiagram
@@ -192,8 +190,6 @@ Decisões de modelagem:
   empreendimento, corretor e preço/m²) e `adr.vw_carteira` (parcela com saldo em aberto, dias de atraso
   e faixa)
 
-![Tela Dados: o DER gerado do catálogo do banco](docs/img/dados-1440.png)
-
 ## Pipeline
 
 ### As fontes e a sujeira
@@ -258,25 +254,25 @@ um gráfico, chamando as mesmas funções de `etl/`:
 
 | Tela | A pergunta | O que tem |
 |---|---|---|
-| Visão geral | Como está a ADR, numa tela só? | 6 KPIs com a variação contra o período anterior, vendas mensais × meta e "O que os dados dizem", com as conclusões e o link para o gráfico que comprova cada uma |
+| Visão geral | Como está a ADR, numa tela só? | 6 KPIs com a variação contra o período anterior e as vendas mensais × meta |
 | Vendas e estoque | O lançamento está vendendo no ritmo certo? | cartão por empreendimento (vendido × estoque, VSO), ritmo de vendas desde o lançamento, boxplot do preço/m² e estatística descritiva |
 | Funil e corretores | De onde vêm os compradores? | funil com a conversão entre etapas, leads e conversão por canal, ranking de corretores |
 | Recebíveis | O dinheiro das parcelas está entrando? | previsto × recebido, saldo por faixa de atraso, mapa de calor empreendimento × faixa |
-| Dados | Dá para confiar nesses números? | DER gerado do catálogo do banco, dicionário de dados e o relatório de qualidade |
-| Console SQL | E se eu quiser perguntar outra coisa? | editor com exemplos prontos, a lista de tabelas e o botão "Restaurar banco" |
+| Dados | Dá para confiar nesses números? | o que a limpeza fez com cada problema dos arquivos brutos, e o que é real e o que é simulado |
 
-Todo gráfico tem **Ver SQL**, que mostra o mesmo arquivo `.sql` que ele executa, com os parâmetros do
-filtro, e **abrir no console**, que roda a consulta lá. Período e empreendimento filtram a tela inteira.
+Todo cartão tem **ver como tabela**, com os números por trás do gráfico. Período e empreendimento
+filtram a tela inteira.
 
 | | |
 |---|---|
 | ![Vendas e estoque](docs/img/vendas-estoque-1440.png) | ![Funil e corretores](docs/img/funil-corretores-1440.png) |
-| ![Recebíveis](docs/img/recebiveis-1440.png) | ![Console SQL](docs/img/console-1440.png) |
+| ![Recebíveis](docs/img/recebiveis-1440.png) | ![Dados](docs/img/dados-1440.png) |
 
 ## Consultas SQL
 
-30 consultas em [`sql/consultas/`](sql/consultas), uma por cartão, todas com os mesmos parâmetros: `$1`
-início do período, `$2` fim do período e `$3` empreendimento (nulo = todos).
+30 consultas em [`sql/consultas/`](sql/consultas): 24 no painel, uma por cartão ou KPI, e 6 que ficam só no
+repositório (o DER lido do catálogo e 5 exemplos avulsos). As que filtram recebem os mesmos parâmetros:
+`$1` início do período, `$2` fim do período e `$3` empreendimento (nulo = todos).
 
 | Tela | Consultas | Um exemplo | Arquivo |
 |---|---|---|---|
@@ -284,8 +280,8 @@ início do período, `$2` fim do período e `$3` empreendimento (nulo = todos).
 | Vendas e estoque | 5 | A vista para o mar faz a unidade valer mais e vender mais rápido? | [`vista_mar.sql`](sql/consultas/vendas-estoque/vista_mar.sql) |
 | Funil e corretores | 3 | Quem são os corretores que mais vendem, e quem subiu ou caiu no ranking? | [`ranking_corretores.sql`](sql/consultas/funil-corretores/ranking_corretores.sql) |
 | Recebíveis | 8 | O distrato costuma vir depois de um atraso longo? | [`distratos_e_atraso.sql`](sql/consultas/recebiveis/distratos_e_atraso.sql) |
-| Dados | 2 | Que tabelas e colunas o banco tem, e como elas se ligam? | [`der.sql`](sql/consultas/dados/der.sql) |
-| Console SQL | 5 | Como as vendas mensais evoluíram desde o primeiro lançamento, sem o sobe e desce? | [`04_media_movel_vendas.sql`](sql/consultas/console/04_media_movel_vendas.sql) |
+| Dados | 2 | Que problemas os arquivos brutos tinham, e o que o pipeline fez com cada um? | [`qualidade.sql`](sql/consultas/dados/qualidade.sql) |
+| Exemplos avulsos | 5 | Como as vendas mensais evoluíram desde o primeiro lançamento, sem o sobe e desce? | [`04_media_movel_vendas.sql`](sql/consultas/console/04_media_movel_vendas.sql) |
 
 O conjunto usa de propósito CTEs, `rank()`, `lag()`, `sum() over` (acumulado), `avg() over` (média
 móvel), `percentile_cont() within group`, `mode()`, `stddev_samp`, `count(*) filter`, `date_trunc`,
@@ -328,7 +324,7 @@ Para a análise ter o que mostrar, a geração **plantou 5 padrões** nos dados:
 4. A inadimplência se concentra num empreendimento e nas vendas com desconto alto
 5. O distrato costuma vir depois de um atraso de mais de 60 dias
 
-As conclusões do painel são verdadeiras nestes dados porque esses padrões foram plantados. Numa base
+Os padrões que o painel mostra aparecem nestes dados porque foram plantados. Numa base
 real, a análise é que descobriria esses padrões.
 
 ## Próximos passos
@@ -336,7 +332,7 @@ real, a análise é que descobriria esses padrões.
 - [x] Dados simulados com semente fixa e gabarito da sujeira
 - [x] Pipeline ler → tratar → validar → carregar, testado contra o gabarito
 - [x] Banco PostgreSQL com DER, views e 30 consultas
-- [x] Painel com 6 telas, "Ver SQL" e console
+- [x] Painel com 5 telas e "ver como tabela" em todo cartão
 - [x] Notebook do pipeline
 - [x] Publicação automática no GitHub Pages, depois de todos os testes
 - [ ] Relatório mensal em Excel para a diretoria
