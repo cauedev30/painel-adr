@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { data, inteiro, mes, mesCurto, moeda, moedaCompacta, pct, reais, variacao } from '../../src/formatar.ts'
+import { data, inteiro, mes, mesCurto, mesPorExtenso, moeda, nomeDoMes, moedaCompacta, pct, reais, variacao } from '../../src/formatar.ts'
 
 describe('moedaCompacta', () => {
   it.each([
@@ -63,6 +63,13 @@ describe('datas', () => {
   it('mês curto do botão do filtro', () => {
     expect(mesCurto('2025-10')).toBe('out 25')
     expect(mesCurto('2023-01')).toBe('jan 23')
+  })
+
+  it('nome do mês na grade e por extenso para o leitor de tela', () => {
+    expect(nomeDoMes('2025-10')).toBe('out')
+    expect(nomeDoMes('2026-05')).toBe('mai')
+    expect(mesPorExtenso('2025-10')).toBe('outubro de 2025')
+    expect(mesPorExtenso('2023-03')).toBe('março de 2023')
   })
 })
 

@@ -17,6 +17,7 @@ function porcentagem(casas: number, sinal: 'auto' | 'exceptZero' = 'auto'): Intl
 const MOEDA = new Intl.NumberFormat(LOCALE, { style: 'currency', currency: 'BRL' })
 const DATA = new Intl.DateTimeFormat(LOCALE, { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC' })
 const MES = new Intl.DateTimeFormat(LOCALE, { month: 'short', timeZone: 'UTC' })
+const MES_LONGO = new Intl.DateTimeFormat(LOCALE, { month: 'long', timeZone: 'UTC' })
 
 /** R$ 12,4 mi · R$ 850 mil · R$ 312. A escala é escolhida depois do arredondamento: 999,6 mil vira R$ 1,0 mi. */
 export function moedaCompacta(valor: number): string {
@@ -63,6 +64,17 @@ export function data(valor: string | Date): string {
 export function mes(anoMes: string): string {
   const d = paraData(`${anoMes}-01`)
   return `${MES.format(d).replace('.', '')}/${d.getUTCFullYear()}`
+}
+
+/** O nome curto do mês, na grade do filtro: "out". */
+export function nomeDoMes(anoMes: string): string {
+  return MES.format(paraData(`${anoMes}-01`)).replace('.', '')
+}
+
+/** O mês por extenso, para o leitor de tela: "outubro de 2025". */
+export function mesPorExtenso(anoMes: string): string {
+  const d = paraData(`${anoMes}-01`)
+  return `${MES_LONGO.format(d)} de ${d.getUTCFullYear()}`
 }
 
 /** O mês curto do botão do filtro: "out 25". */

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
-  ATALHOS_DE_PERIODO, MESES_DOS_DADOS, PADRAO, PRIMEIRO_MES, TELAS, ULTIMO_MES, atalhoAtivo, escreverHash, lerHash, linkDoCartao,
-  paramsDaRota, periodoAnterior, resumoDoPeriodo,
+  ANOS_DOS_DADOS, ATALHOS_DE_PERIODO, MESES_DOS_DADOS, PADRAO, PRIMEIRO_MES, TELAS, ULTIMO_MES, atalhoAtivo, escreverHash, lerHash, linkDoCartao,
+  mesNosDados, mesesDoAno, ordenarIntervalo, paramsDaRota, periodoAnterior, posicaoNoIntervalo, resumoDoPeriodo,
 } from '../../src/navegacao/rotas.ts'
 
 describe('as telas', () => {
@@ -75,6 +75,32 @@ describe('o botão do período', () => {
   it('o resumo: "out 25 – set 26"; um mês só, sem traço', () => {
     expect(resumoDoPeriodo(PADRAO)).toBe('out 25 – set 26')
     expect(resumoDoPeriodo(lerHash('#/visao-geral?de=2026-09&ate=2026-09'))).toBe('set 26')
+  })
+})
+
+describe('a grade de meses do filtro', () => {
+  it('os anos dos dados e os 12 meses de cada um', () => {
+    expect(ANOS_DOS_DADOS).toEqual([2023, 2024, 2025, 2026])
+    expect(mesesDoAno(2026)).toHaveLength(12)
+    expect(mesesDoAno(2026).slice(0, 2)).toEqual(['2026-01', '2026-02'])
+    expect(mesesDoAno(2026).at(-1)).toBe('2026-12')
+  })
+
+  it('o mês fora dos dados fica apagado', () => {
+    expect(mesNosDados('2026-09')).toBe(true)
+    expect(mesNosDados('2026-10')).toBe(false)
+    expect(mesNosDados('2022-12')).toBe(false)
+  })
+
+  it('a posição de cada mês no intervalo', () => {
+    expect(['2025-01', '2025-02', '2025-03', '2025-04'].map((m) => posicaoNoIntervalo(m, '2025-01', '2025-03')))
+      .toEqual(['inicio', 'meio', 'fim', null])
+    expect(posicaoNoIntervalo('2025-05', '2025-05', '2025-05')).toBe('unico')
+  })
+
+  it('os dois cliques viram de–até, o menor primeiro', () => {
+    expect(ordenarIntervalo('2025-03', '2025-01')).toEqual({ de: '2025-01', ate: '2025-03' })
+    expect(ordenarIntervalo('2025-01', '2025-03')).toEqual({ de: '2025-01', ate: '2025-03' })
   })
 })
 

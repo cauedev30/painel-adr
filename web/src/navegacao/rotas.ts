@@ -31,7 +31,8 @@ export const PADRAO: Rota = { tela: 'visao-geral', de: '2025-10', ate: '2026-09'
 
 const ANO_MES = /^\d{4}-(0[1-9]|1[0-2])$/
 
-function mesValido(valor: string | null): valor is string {
+/** O mês existe nos dados (jan/2023 a set/2026)? Na grade do filtro, o que não existe fica apagado. */
+export function mesNosDados(valor: string | null): valor is string {
   return valor !== null && ANO_MES.test(valor) && valor >= PRIMEIRO_MES && valor <= ULTIMO_MES
 }
 
@@ -42,8 +43,8 @@ export function lerHash(hash: string): Rota {
 
   let de = params.get('de')
   let ate = params.get('ate')
-  de = mesValido(de) ? de : PADRAO.de
-  ate = mesValido(ate) ? ate : PADRAO.ate
+  de = mesNosDados(de) ? de : PADRAO.de
+  ate = mesNosDados(ate) ? ate : PADRAO.ate
   if (de > ate) [de, ate] = [ate, de]
 
   const emp = Number(params.get('emp'))
@@ -85,6 +86,30 @@ export const ATALHOS_DE_PERIODO = [
   { id: 'ano', nome: 'Este ano', de: `${ULTIMO_MES.slice(0, 4)}-01`, ate: ULTIMO_MES },
   { id: 'tudo', nome: 'Tudo', de: PRIMEIRO_MES, ate: ULTIMO_MES },
 ] as const
+
+/** Os anos da grade de meses do filtro, do primeiro ao último mês dos dados. */
+export const ANOS_DOS_DADOS: number[] = Array.from(
+  { length: Number(ULTIMO_MES.slice(0, 4)) - Number(PRIMEIRO_MES.slice(0, 4)) + 1 },
+  (_, i) => Number(PRIMEIRO_MES.slice(0, 4)) + i,
+)
+
+/** Os 12 meses de um ano, em AAAA-MM. */
+export function mesesDoAno(ano: number): string[] {
+  return Array.from({ length: 12 }, (_, i) => `${ano}-${String(i + 1).padStart(2, '0')}`)
+}
+
+/** Onde o mês cai no intervalo de–até, para pintar a grade: as pontas, o meio ou fora. */
+export function posicaoNoIntervalo(mes: string, de: string, ate: string): 'inicio' | 'fim' | 'unico' | 'meio' | null {
+  if (mes === de && mes === ate) return 'unico'
+  if (mes === de) return 'inicio'
+  if (mes === ate) return 'fim'
+  return mes > de && mes < ate ? 'meio' : null
+}
+
+/** Os dois meses clicados na grade, o menor primeiro. */
+export function ordenarIntervalo(a: string, b: string): { de: string; ate: string } {
+  return a <= b ? { de: a, ate: b } : { de: b, ate: a }
+}
 
 /** O atalho que bate com o período da rota, ou null (período escolhido à mão). */
 export function atalhoAtivo(rota: Rota): (typeof ATALHOS_DE_PERIODO)[number]['id'] | null {

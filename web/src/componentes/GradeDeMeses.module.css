@@ -1,0 +1,109 @@
+/* embaixo dos atalhos, separada por uma linha fina */
+.grade {
+  margin-top: var(--esp-4);
+  padding-top: var(--esp-4);
+  border-top: 1px solid var(--borda);
+}
+
+.cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--esp-3);
+}
+
+.ano {
+  font-size: var(--tamanho-texto);
+  font-weight: 600;
+  color: var(--texto);
+}
+
+.seta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--raio-pequeno);
+  color: var(--texto-2);
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.seta:hover:not(:disabled) {
+  color: var(--texto);
+  border-color: var(--borda);
+}
+
+.seta:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+/* o traço "seta" aponta para baixo; girado, vira ‹ e › */
+.esquerda,
+.direita {
+  display: inline-flex;
+}
+
+.esquerda {
+  transform: rotate(90deg);
+}
+
+.direita {
+  transform: rotate(-90deg);
+}
+
+.meses {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+}
+
+.mes {
+  height: 36px;
+  padding: 0;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: var(--texto-2);
+  font-size: var(--tamanho-pequeno);
+  transition: color 0.15s, background-color 0.15s, border-color 0.15s;
+}
+
+.mes:hover:not(:disabled) {
+  color: var(--texto);
+  border-color: color-mix(in srgb, var(--cobre) 55%, var(--borda));
+}
+
+.mes:focus-visible {
+  outline: none;
+  border-color: var(--cobre);
+}
+
+.mes:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+/* o intervalo: as pontas em cobre cheio, o meio em cobre claro */
+.mes[data-posicao='meio'] {
+  color: var(--texto);
+  background: color-mix(in srgb, var(--cobre) 16%, transparent);
+}
+
+.mes[data-posicao='inicio'],
+.mes[data-posicao='fim'],
+.mes[data-posicao='unico'] {
+  color: var(--fundo);
+  background: var(--cobre);
+  font-weight: 600;
+}
+
+.dica {
+  margin-top: var(--esp-3);
+  font-size: 0.75rem;
+  color: var(--texto-2);
+}

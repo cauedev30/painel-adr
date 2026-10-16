@@ -241,7 +241,8 @@ faixas, consulta ao catálogo (`information_schema`) para gerar o DER.
 - **Cartão:** título-pergunta, frase-resposta calculada dos dados, gráfico e "ver como tabela".
 - **Filtros:** 2 botões no topo, com ícone e o filtro ativo ("out 25 – set 26", "Todos"); valem para
   todos os cartões da tela. Cada um abre um painel flutuante: o período com os atalhos "Últimos 12
-  meses", "Este ano" e "Tudo" e o De/Até; o empreendimento, numa lista. Fecha com Esc, clique fora ou ao
+  meses", "Este ano" e "Tudo" e a grade de meses (um ano por vez; 1º clique no início, 2º no fim, o
+  intervalo em cobre; meses fora dos dados apagados); o empreendimento, numa lista. Fecha com Esc, clique fora ou ao
   escolher.
 - **Balão ao passar o mouse:** valor exato em formato brasileiro (R$ 12,4 mi; 8,1%; 30/09/2026).
 - **Tela de carregamento:** logo ADR e "Carregando o banco PostgreSQL no seu navegador…".
