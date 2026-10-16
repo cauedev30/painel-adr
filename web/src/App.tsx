@@ -7,6 +7,7 @@ import { FaixaSuperior } from './componentes/FaixaSuperior.tsx'
 import { Protecao } from './componentes/Protecao.tsx'
 import type { IdTela } from './navegacao/rotas.ts'
 import { usarCartaoEmFoco, usarRota } from './navegacao/usarRota.ts'
+import { RegistroDoPdf } from './pdf/registro.tsx'
 import { Dados } from './telas/Dados.tsx'
 import { FunilCorretores } from './telas/FunilCorretores.tsx'
 import { Recebiveis } from './telas/Recebiveis.tsx'
@@ -29,21 +30,24 @@ export function App() {
   if (!banco.pronto) return <Carregando erro={banco.erro} tentarDeNovo={banco.tentarDeNovo} />
 
   const Tela = TELAS[rota.tela]
+  // o registro do PDF guarda o que cada cartão mostra, para o "Baixar PDF da tela" do cabeçalho
   return (
-    <div className={css.painel}>
-      <a className={css.pular} href="#conteudo" onClick={(e) => {
-        e.preventDefault()
-        document.getElementById('conteudo')?.focus()
-      }}>Pular para o conteúdo</a>
-      <BarraLateral rota={rota} />
-      <div className={css.coluna}>
-        <FaixaSuperior rota={rota} navegar={navegar} />
-        <main id="conteudo" className={css.conteudo} tabIndex={-1}>
-          <Protecao key={rota.tela} aviso="Esta tela não conseguiu abrir.">
-            <Tela rota={rota} navegar={navegar} />
-          </Protecao>
-        </main>
+    <RegistroDoPdf rota={rota}>
+      <div className={css.painel}>
+        <a className={css.pular} href="#conteudo" onClick={(e) => {
+          e.preventDefault()
+          document.getElementById('conteudo')?.focus()
+        }}>Pular para o conteúdo</a>
+        <BarraLateral rota={rota} />
+        <div className={css.coluna}>
+          <FaixaSuperior rota={rota} navegar={navegar} />
+          <main id="conteudo" className={css.conteudo} tabIndex={-1}>
+            <Protecao key={rota.tela} aviso="Esta tela não conseguiu abrir.">
+              <Tela rota={rota} navegar={navegar} />
+            </Protecao>
+          </main>
+        </div>
       </div>
-    </div>
+    </RegistroDoPdf>
   )
 }

@@ -1,5 +1,6 @@
 import type { Param } from '../banco/cliente.ts'
 import { usarConsulta } from '../banco/usarConsulta.ts'
+import { usarEntradaDoPdf } from '../pdf/registro.tsx'
 import { type DefinicaoKpi, type LinhaKpi, lerKpi } from '../telas/respostas.ts'
 import css from './Kpi.module.css'
 
@@ -19,6 +20,13 @@ const PALAVRA_DO_TOM = { bom: 'melhorou', ruim: 'piorou', neutro: 'sem mudança'
 export function Kpi({ kpi, params, periodoAnterior }: Props) {
   const { linhas, erro, carregando } = usarConsulta<LinhaKpi>(kpi.consulta, params)
   const leitura = linhas?.[0] ? lerKpi(kpi, linhas[0]) : null
+  // o "Baixar PDF da tela" leva o KPI como está na tela
+  usarEntradaDoPdf({
+    tipo: 'kpi', ancora: `kpi-${kpi.id}`, titulo: kpi.titulo, extenso: kpi.extenso,
+    valor: erro ? 'a consulta falhou' : leitura?.valor ?? '—',
+    seta: leitura?.variacao.seta ?? '=', variacao: leitura?.variacao.texto ?? '', tom: leitura?.tom ?? 'neutro',
+    contra: periodoAnterior, pronto: !carregando,
+  })
 
   return (
     <article className={css.kpi} aria-labelledby={`kpi-${kpi.id}`} aria-busy={carregando}>

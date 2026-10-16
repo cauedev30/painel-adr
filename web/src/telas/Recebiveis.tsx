@@ -8,6 +8,7 @@ import {
   type LinhaInadEmpreendimento, type LinhaMapaCalor, type LinhaPrevistoRecebido, respostaFaixas,
   respostaInadDesconto, respostaInadEmpreendimento, respostaMapaCalor, respostaPrevistoRecebido, rotuloDaFaixa, textoDaComparacao,
 } from './respostas.ts'
+import { tabelaMapaCalor } from './pdf.ts'
 import css from './Telas.module.css'
 import type { PropsDaTela } from './tipos.ts'
 
@@ -102,6 +103,7 @@ export function Recebiveis({ rota }: PropsDaTela) {
         altura={180}
         conteudo={(linhas) => <MapaCalor linhas={linhas} />}
         nomeDoConteudo="mapa"
+        pdf={{ tabela: tabelaMapaCalor }}
         colunas={[
           { chave: 'nome', titulo: 'Empreendimento' },
           { chave: 'faixa', titulo: 'Faixa de atraso', formato: rotuloDaFaixa },

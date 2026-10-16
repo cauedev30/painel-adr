@@ -238,7 +238,11 @@ faixas, consulta ao catálogo (`information_schema`) para gerar o DER.
 
 ### 6.2 Componentes comuns
 
-- **Cartão:** título-pergunta, frase-resposta calculada dos dados, gráfico e "ver como tabela".
+- **Cartão:** título-pergunta, frase-resposta calculada dos dados, gráfico, "ver como tabela" e "baixar PDF".
+- **PDF:** "baixar PDF" em cada cartão e "Baixar PDF da tela" no cabeçalho (KPIs e todos os cartões, em
+  ordem). A4 claro com o logo e o cobre da ADR, a Lexend Deca embutida, filtros por extenso e data de
+  geração no cabeçalho, "Dados simulados · Painel de Dados ADR" e a página no rodapé; cada cartão com
+  título, frase, gráfico redesenhado em cores de papel e a tabela formatada. O jsPDF só baixa no clique.
 - **Filtros:** 2 botões no topo, com ícone e o filtro ativo ("out 25 – set 26", "Todos"); valem para
   todos os cartões da tela. Cada um abre um painel flutuante: o período com os atalhos "Últimos 12
   meses", "Este ano" e "Tudo" e a grade de meses (um ano por vez; 1º clique no início, 2º no fim, o

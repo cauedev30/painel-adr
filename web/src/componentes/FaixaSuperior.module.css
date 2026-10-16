@@ -27,6 +27,14 @@
   animation: aparecer var(--duracao-entrada) var(--curva-entrada) both;
 }
 
+/* os filtros e o "Baixar PDF da tela" na mesma linha */
+.acoes {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-2);
+  margin-left: auto;
+}
+
 .corte {
   font-size: var(--tamanho-pequeno);
   color: var(--texto-2);
@@ -39,5 +47,19 @@
 
   .titulo h1 {
     font-size: 1.0625rem;
+  }
+
+  /* no celular, o botão do PDF sobe para a linha do título, e os filtros ficam com a linha inteira deles */
+  .titulo {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .acoes {
+    display: contents;
+  }
+
+  .acoes > [role='group'] {
+    order: 1;
   }
 }

@@ -1,6 +1,7 @@
 import { Cartao } from '../componentes/Cartao.tsx'
 import { inteiro } from '../formatar.ts'
 import { paramsDaRota } from '../navegacao/rotas.ts'
+import { usarEntradaDoPdf } from '../pdf/registro.tsx'
 import { ACOES, REGRAS } from '../regras.ts'
 import { type LinhaQualidade, respostaQualidade } from './respostas.ts'
 import css from './Telas.module.css'
@@ -69,36 +70,56 @@ function Qualidade({ linhas }: { linhas: LinhaQualidade[] }) {
 }
 
 /** Seções 3.1 e 3.2 da spec: o que veio do site da ADR e o que foi simulado, com os padrões plantados. */
+const REAL_E_SIMULADO = [
+  {
+    titulo: 'Real, do site da ADR',
+    itens: [
+      'Os 7 empreendimentos: nomes, bairros, status e previsão de entrega.',
+      'As 102 unidades do Mares Bessa e as faixas de área de cada empreendimento.',
+      'As tipologias (studio, duplex, garden), o slogan "Ousadia que constrói valor" e a venda por corretores.',
+      'O logo e as fotos dos empreendimentos.',
+    ],
+  },
+  {
+    titulo: 'Simulado, com semente fixa',
+    itens: [
+      'As unidades dos outros 3 lançados (390 no total), os lançamentos e os preços.',
+      '≈ 15 mil leads, ≈ 280 vendas, ≈ 35 corretores em 8 imobiliárias, o plano de pagamento, as parcelas e os pagamentos.',
+      'A sujeira dos arquivos brutos (R1 a R7), para o pipeline ter o que tratar.',
+    ],
+  },
+  {
+    titulo: 'Padrões plantados, de propósito',
+    itens: [
+      'O canal que mais traz leads não é o que mais converte.',
+      'Poucos corretores concentram as vendas.',
+      'A vista mar cobra mais pelo m² e vende mais rápido.',
+      'A inadimplência se concentra num empreendimento e nas vendas com desconto alto.',
+      'O distrato vem depois de um atraso acima de 60 dias.',
+    ],
+  },
+]
+
+function Bloco({ bloco }: { bloco: (typeof REAL_E_SIMULADO)[number] }) {
+  return (
+    <>
+      <h3>{bloco.titulo}</h3>
+      <ul>{bloco.itens.map((item) => <li key={item}>{item}</li>)}</ul>
+    </>
+  )
+}
+
 function RealSimulado() {
+  const titulo = 'O que é real e o que é simulado'
+  // o "Baixar PDF da tela" leva este texto também
+  usarEntradaDoPdf({ tipo: 'texto', ancora: 'real-simulado', titulo, blocos: REAL_E_SIMULADO, pronto: true })
+  const [real, ...simulado] = REAL_E_SIMULADO
   return (
     <section className={css.realSimulado} aria-labelledby="real-simulado">
-      <h2 id="real-simulado" className={css.tituloSecao}>O que é real e o que é simulado</h2>
+      <h2 id="real-simulado" className={css.tituloSecao}>{titulo}</h2>
       <div className={css.duasColunas}>
-        <div>
-          <h3>Real, do site da ADR</h3>
-          <ul>
-            <li>Os 7 empreendimentos: nomes, bairros, status e previsão de entrega.</li>
-            <li>As 102 unidades do Mares Bessa e as faixas de área de cada empreendimento.</li>
-            <li>As tipologias (studio, duplex, garden), o slogan "Ousadia que constrói valor" e a venda por corretores.</li>
-            <li>O logo e as fotos dos empreendimentos.</li>
-          </ul>
-        </div>
-        <div>
-          <h3>Simulado, com semente fixa</h3>
-          <ul>
-            <li>As unidades dos outros 3 lançados (390 no total), os lançamentos e os preços.</li>
-            <li>≈ 15 mil leads, ≈ 280 vendas, ≈ 35 corretores em 8 imobiliárias, o plano de pagamento, as parcelas e os pagamentos.</li>
-            <li>A sujeira dos arquivos brutos (R1 a R7), para o pipeline ter o que tratar.</li>
-          </ul>
-          <h3>Padrões plantados, de propósito</h3>
-          <ul>
-            <li>O canal que mais traz leads não é o que mais converte.</li>
-            <li>Poucos corretores concentram as vendas.</li>
-            <li>A vista mar cobra mais pelo m² e vende mais rápido.</li>
-            <li>A inadimplência se concentra num empreendimento e nas vendas com desconto alto.</li>
-            <li>O distrato vem depois de um atraso acima de 60 dias.</li>
-          </ul>
-        </div>
+        <div><Bloco bloco={real} /></div>
+        <div>{simulado.map((b) => <Bloco key={b.titulo} bloco={b} />)}</div>
       </div>
     </section>
   )

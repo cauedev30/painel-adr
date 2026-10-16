@@ -8,6 +8,7 @@ import { PALETA } from '../tema/paleta.ts'
 import {
   type LinhaEmpreendimento, type LinhaRitmo, respostaEmpreendimentos, respostaRitmo,
 } from './respostas.ts'
+import { pdfEmpreendimentos, pdfRitmo, tabelaRitmo } from './pdf.ts'
 import css from './Telas.module.css'
 import type { PropsDaTela } from './tipos.ts'
 
@@ -26,6 +27,7 @@ export function VendasEstoque({ rota }: PropsDaTela) {
         params={params}
         resposta={respostaEmpreendimentos}
         conteudo={(linhas) => <Empreendimentos linhas={linhas} />}
+        pdf={{ grafico: pdfEmpreendimentos }}
         colunas={[
           { chave: 'nome', titulo: 'Empreendimento' },
           { chave: 'status', titulo: 'Status', formato: (s: string) => STATUS[s] ?? s },
@@ -46,6 +48,7 @@ export function VendasEstoque({ rota }: PropsDaTela) {
         resposta={respostaRitmo}
         altura={190}
         conteudo={(linhas) => <Ritmo linhas={linhas} />}
+        pdf={{ grafico: pdfRitmo, tabela: tabelaRitmo }}
         colunas={[
           { chave: 'nome', titulo: 'Empreendimento' },
           { chave: 'mes_desde_lancamento', titulo: 'Mês desde o lançamento', numerica: true, formato: inteiro },

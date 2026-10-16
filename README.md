@@ -265,7 +265,9 @@ abaixo, calculada dos dados.
 | Recebíveis | O dinheiro das parcelas está entrando? | previsto × recebido, saldo por faixa de atraso, mapa de calor empreendimento × faixa, e a inadimplência por empreendimento e por desconto |
 | Dados | Dá para confiar nesses números? | o que a limpeza fez com cada problema dos arquivos brutos, e o que é real e o que é simulado |
 
-Todo cartão tem **ver como tabela**, com os números por trás do gráfico. Os filtros ficam em dois
+Todo cartão tem **ver como tabela**, com os números por trás do gráfico, e **baixar PDF**; o cabeçalho
+tem **Baixar PDF da tela**, um relatório com os KPIs e todos os cartões, na identidade da ADR, pronto
+para mandar ao comercial ou ao financeiro. Os filtros ficam em dois
 botões no topo: o **período**, com atalhos de um clique ("Últimos 12 meses", "Este ano", "Tudo") e uma
 grade de meses para o período exato, e o **empreendimento**. O filtro vai para o endereço da página,
 então um link já abre filtrado.
@@ -351,6 +353,7 @@ porque foram plantados; numa base real, a análise é que os descobriria.
 - [x] Pipeline ler → tratar → validar → carregar, testado contra o gabarito
 - [x] Banco PostgreSQL com DER, views e 30 consultas
 - [x] Painel com 5 telas, filtros de um clique e "ver como tabela" em todo cartão
+- [x] PDF de cada cartão e de cada tela, com a identidade da ADR
 - [x] Notebook do pipeline
 - [x] Publicação automática no GitHub Pages, depois de todos os testes
 - [ ] Relatório mensal em Excel para a diretoria

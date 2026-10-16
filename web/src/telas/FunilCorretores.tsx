@@ -8,6 +8,7 @@ import {
   type LinhaCanal, type LinhaFunil, type LinhaRanking, NOMES_DAS_ETAPAS, canalQueMaisConverte, respostaCanais, respostaFunil,
   respostaRanking, variacaoDePosicao,
 } from './respostas.ts'
+import { pdfCanais } from './pdf.ts'
 import css from './Telas.module.css'
 import type { PropsDaTela } from './tipos.ts'
 
@@ -66,6 +67,7 @@ export function FunilCorretores({ rota }: PropsDaTela) {
         resposta={respostaCanais}
         altura={260}
         conteudo={(linhas) => <Canais linhas={linhas} />}
+        pdf={{ grafico: (linhas) => pdfCanais(linhas, canalQueMaisConverte(linhas)?.canal) }}
         nomeDoConteudo="gráfico"
         colunas={[
           { chave: 'canal', titulo: 'Canal', formato: nomeDoCanal },

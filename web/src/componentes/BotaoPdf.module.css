@@ -1,0 +1,55 @@
+/* "Baixar PDF da tela": o mesmo feitio dos botões de filtro, ao lado deles */
+.botao {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--esp-2);
+  height: 40px;
+  padding: 0 var(--esp-3);
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-pequeno);
+  color: var(--texto);
+  font-size: 0.875rem;
+  white-space: nowrap;
+  transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
+}
+
+.botao:hover {
+  border-color: color-mix(in srgb, var(--cobre) 55%, var(--borda));
+}
+
+.botao:focus-visible {
+  outline: none;
+  border-color: var(--cobre);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--cobre) 18%, transparent);
+}
+
+.botao[aria-busy='true'] {
+  cursor: progress;
+  color: var(--texto-2);
+}
+
+.icone {
+  display: inline-flex;
+  color: var(--cobre);
+}
+
+.curto {
+  display: none;
+}
+
+/* no celular, o botão divide a linha com os filtros: só o ícone e "PDF" */
+@media (max-width: 899px) {
+  .botao {
+    flex: none;
+    padding: 0 var(--esp-2);
+  }
+
+  .longo {
+    display: none;
+  }
+
+  .curto {
+    display: inline;
+  }
+}

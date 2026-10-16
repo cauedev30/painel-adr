@@ -1,11 +1,12 @@
 import { data } from '../formatar.ts'
 import { DATA_DE_CORTE, type Rota, TELAS } from '../navegacao/rotas.ts'
+import { BotaoPdfDaTela } from './BotaoPdf.tsx'
 import css from './FaixaSuperior.module.css'
 import { Filtros } from './Filtros.tsx'
 
 type Props = { rota: Rota; navegar: (mudanca: Partial<Rota>) => void }
 
-/** O nome da tela, os filtros (nas telas que os usam) e até quando vão os dados. */
+/** O nome da tela, os filtros (nas telas que os usam), até quando vão os dados e o PDF da tela. */
 export function FaixaSuperior({ rota, navegar }: Props) {
   const tela = TELAS.find((t) => t.id === rota.tela) ?? TELAS[0]
   return (
@@ -15,7 +16,10 @@ export function FaixaSuperior({ rota, navegar }: Props) {
         <h1 key={tela.id}>{tela.nome}</h1>
         <p className={css.corte}>dados até {data(DATA_DE_CORTE)}</p>
       </div>
-      {tela.filtros && <Filtros rota={rota} navegar={navegar} />}
+      <div className={css.acoes}>
+        {tela.filtros && <Filtros rota={rota} navegar={navegar} />}
+        <BotaoPdfDaTela />
+      </div>
     </header>
   )
 }

@@ -1,16 +1,12 @@
+import { type ColunaDeTabela, textoDaCelula } from '../pdf/conteudo.ts'
 import css from './TabelaDados.module.css'
 
-export type Coluna<T> = {
-  chave: keyof T & string
-  titulo: string
-  /** Como escrever o valor (formatar.ts); sem formato, sai como veio. */
-  formato?: (valor: never) => string
-  numerica?: boolean
-}
+/** Uma coluna: chave, título, formato (formatar.ts; sem formato, sai como veio) e se é numérica. */
+export type Coluna<T> = ColunaDeTabela<T>
 
 type Props<T> = { linhas: T[]; colunas: Coluna<T>[]; legenda: string }
 
-/** "Ver como tabela": os mesmos dados do gráfico, em tabela (acessibilidade, seção 6.3). */
+/** "Ver como tabela": os mesmos dados do gráfico, em tabela (acessibilidade, seção 6.3). O PDF usa o mesmo texto de cada célula. */
 export function TabelaDados<T>({ linhas, colunas, legenda }: Props<T>) {
   return (
     <div className={css.rolagem}>
@@ -25,9 +21,7 @@ export function TabelaDados<T>({ linhas, colunas, legenda }: Props<T>) {
           {linhas.map((linha, i) => (
             <tr key={i}>
               {colunas.map((c) => {
-                const valor = linha[c.chave]
-                const texto = c.formato ? (c.formato as (v: unknown) => string)(valor) : String(valor ?? '—')
-                return <td key={c.chave} className={c.numerica ? css.numero : undefined}>{texto}</td>
+                return <td key={c.chave} className={c.numerica ? css.numero : undefined}>{textoDaCelula(c, linha[c.chave])}</td>
               })}
             </tr>
           ))}

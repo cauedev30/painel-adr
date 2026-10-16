@@ -1,7 +1,7 @@
 // Ícones de traço, desenhados à mão em SVG (sem biblioteca), na cor do texto em volta.
 import type { Icone as NomeDoIcone } from '../navegacao/rotas.ts'
 
-export type Nome = NomeDoIcone | 'menu' | 'fechar' | 'tabela' | 'grafico' | 'seta' | 'calendario' | 'marcado'
+export type Nome = NomeDoIcone | 'menu' | 'fechar' | 'tabela' | 'grafico' | 'seta' | 'calendario' | 'marcado' | 'baixar'
 
 const TRACOS: Record<Nome, string> = {
   painel: 'M4 13h6V4H4zM14 20h6V11h-6zM4 20h6v-3H4zM14 7h6V4h-6z',
@@ -16,6 +16,7 @@ const TRACOS: Record<Nome, string> = {
   seta: 'M7 10l5 5 5-5',
   calendario: 'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4',
   marcado: 'M5 12l4 4 10-10',
+  baixar: 'M12 4v11M7 10l5 5 5-5M5 20h14',
 }
 
 export function Icone({ nome, tamanho = 20 }: { nome: Nome; tamanho?: number }) {
