@@ -53,18 +53,39 @@ export const TEMA_ECHARTS = {
 /** Atraso entre uma barra e a seguinte, e o teto dele: o gráfico de muitos pontos não fica esperando. */
 export const PASSO_DAS_BARRAS = 30
 export const ATRASO_MAXIMO = 300
+/** Quanto a barra leva para crescer (--duracao-barra). */
+export const DURACAO_DA_BARRA = 600
+/** A espera do primeiro desenho: a duração da entrada do cartão (--duracao-entrada), como a barra vendido × estoque. */
+export const ATRASO_DA_ENTRADA = 320
 
 /**
- * O movimento dos gráficos (os mesmos tempos de estilos/tokens.css): as barras crescem em 600 ms, uma
- * 30 ms depois da outra; com "reduzir movimento" ligado no sistema, nada anima.
+ * O movimento dos gráficos (os mesmos tempos de estilos/tokens.css): no primeiro desenho (`entrada`), as
+ * barras crescem do eixo em 600 ms, depois da entrada do cartão e uma 30 ms depois da outra, e as linhas
+ * se desenham da esquerda; na troca de filtro, mudam em 400 ms. Com "reduzir movimento" ligado no
+ * sistema, nada anima.
  */
-export function animacaoDosGraficos(reduzir: boolean): EChartsOption {
+export function animacaoDosGraficos(reduzir: boolean, entrada = false): EChartsOption {
   if (reduzir) return { animation: false }
+  const espera = entrada ? ATRASO_DA_ENTRADA : 0
   return {
     animation: true,
-    animationDuration: 600,
+    animationDuration: DURACAO_DA_BARRA,
     animationEasing: 'cubicOut',
-    animationDelay: (i: number) => Math.min(i * PASSO_DAS_BARRAS, ATRASO_MAXIMO),
+    // a linha e a área pedem o atraso sem índice: valem como o primeiro ponto
+    animationDelay: (i: number) => espera + Math.min((i || 0) * PASSO_DAS_BARRAS, ATRASO_MAXIMO),
     animationDurationUpdate: 400,
   }
+}
+
+/** Do primeiro desenho até a última barra terminar de crescer. */
+export const FIM_DA_ENTRADA = ATRASO_DA_ENTRADA + ATRASO_MAXIMO + DURACAO_DA_BARRA
+
+/**
+ * Como redimensionar o gráfico `ms` depois do primeiro desenho. O resize do ECharts redesenha sem
+ * animação e cortaria o crescimento das barras (o cartão muda de largura quando a barra de rolagem
+ * aparece, enquanto os outros cartões carregam): durante a entrada, ele segue animado, com o mesmo ritmo.
+ */
+export function animacaoDoRedimensionamento(reduzir: boolean, ms: number): { animation: { duration: number; easing: 'cubicOut' } } | undefined {
+  if (reduzir || ms >= FIM_DA_ENTRADA) return undefined
+  return { animation: { duration: DURACAO_DA_BARRA, easing: 'cubicOut' } }
 }
