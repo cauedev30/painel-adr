@@ -14,9 +14,17 @@
   gap: var(--esp-1);
 }
 
+/* o nome da tela troca com fade, no mesmo tempo da entrada dos blocos (Telas.module.css) */
+@keyframes aparecer {
+  from {
+    opacity: 0;
+  }
+}
+
 .titulo h1 {
   font-size: 1.375rem;
   letter-spacing: 0.14em;
+  animation: aparecer var(--duracao-entrada) var(--curva-entrada) both;
 }
 
 .corte {

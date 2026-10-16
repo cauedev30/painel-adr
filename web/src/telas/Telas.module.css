@@ -4,6 +4,48 @@
   gap: var(--esp-5);
 }
 
+/* A entrada da tela: cada bloco aparece e sobe 6 px, um depois do outro. A tela é remontada a cada
+   troca (App.tsx), então a entrada roda ao trocar de tela, não ao mudar o filtro. */
+@keyframes entrar {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+.tela > * {
+  animation: entrar var(--duracao-entrada) var(--curva-entrada) both;
+  animation-delay: calc(var(--ordem, 0) * var(--passo-cascata));
+}
+
+.tela > :nth-child(2) { --ordem: 1; }
+.tela > :nth-child(3) { --ordem: 2; }
+.tela > :nth-child(4) { --ordem: 3; }
+.tela > :nth-child(5) { --ordem: 4; }
+.tela > :nth-child(6) { --ordem: 5; }
+.tela > :nth-child(n + 7) { --ordem: 6; }
+
+/* os KPIs entram um a um, a partir da vez do grupo (o --ordem vem do grupo, por herança) */
+.tela > .kpis {
+  animation: none;
+}
+
+.kpis > * {
+  animation: entrar var(--duracao-entrada) var(--curva-entrada) both;
+  animation-delay: calc((var(--ordem, 0) + var(--i, 0)) * var(--passo-cascata));
+}
+
+.kpis > :nth-child(2) { --i: 1; }
+.kpis > :nth-child(3) { --i: 2; }
+.kpis > :nth-child(4) { --i: 3; }
+.kpis > :nth-child(5) { --i: 4; }
+.kpis > :nth-child(n + 6) { --i: 5; }
+
+/* o que vem depois dos KPIs espera a vez deles, para a cascata descer na ordem da tela */
+.tela > .kpis ~ * {
+  animation-delay: calc((var(--ordem, 0) + 5) * var(--passo-cascata));
+}
+
 /* a faixa com a foto noturna de um Mares, no topo da visão geral */
 .faixaFoto {
   position: relative;
@@ -110,11 +152,22 @@
   overflow: hidden;
 }
 
+/* cresce da esquerda até a largura do style (vendidas ÷ unidades), depois que o cartão entra */
+@keyframes crescer {
+  from {
+    width: 0;
+  }
+}
+
 .barra span {
   display: block;
   height: 100%;
   background: var(--cobre);
   border-radius: 4px;
+  animation: crescer var(--duracao-barra) var(--curva-entrada) both;
+  animation-delay: var(--duracao-entrada);
+  /* na troca de filtro o cartão não é remontado: a barra desliza até a largura nova */
+  transition: width var(--duracao-barra) var(--curva-entrada);
 }
 
 .legendaBarra {

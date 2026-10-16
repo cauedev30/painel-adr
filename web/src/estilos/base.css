@@ -89,6 +89,8 @@ table,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    /* sem isso, a cascata deixaria os blocos invisíveis durante o atraso */
+    animation-delay: 0ms !important;
     transition-duration: 0.01ms !important;
   }
 }

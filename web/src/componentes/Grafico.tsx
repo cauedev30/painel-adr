@@ -7,7 +7,7 @@ import * as echarts from 'echarts/core'
 import { SVGRenderer } from 'echarts/renderers'
 import { useEffect, useRef } from 'react'
 import { inteiro } from '../formatar.ts'
-import { TEMA, TEMA_ECHARTS } from '../tema/echarts.ts'
+import { TEMA, TEMA_ECHARTS, animacaoDosGraficos } from '../tema/echarts.ts'
 
 echarts.use([BarChart, BoxplotChart, LineChart, ScatterChart, AriaComponent, GridComponent, LegendComponent, TooltipComponent, SVGRenderer])
 echarts.registerTheme(TEMA, TEMA_ECHARTS)
@@ -40,6 +40,7 @@ export function Grafico({ opcao, rotulo, formatoDoValor = inteiro, altura = 280 
   useEffect(() => {
     // o balão de todo gráfico escreve os valores no formato brasileiro (formatar.ts)
     const base: EChartsOption = {
+      ...animacaoDosGraficos(window.matchMedia('(prefers-reduced-motion: reduce)').matches),
       aria: { enabled: true, label: { description: rotulo } },
       tooltip: {
         trigger: 'axis',

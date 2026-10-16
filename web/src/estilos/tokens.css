@@ -50,4 +50,11 @@
   --raio-pequeno: 4px;
   --largura-barra: 248px;
   --sombra: 0 8px 32px rgb(0 0 0 / 0.5);
+
+  /* movimento: entrada da tela em cascata e barras crescendo, leve e rápido (os gráficos do ECharts
+     usam os mesmos tempos, em tema/echarts.ts) */
+  --duracao-entrada: 320ms;
+  --duracao-barra: 600ms;
+  --passo-cascata: 40ms;
+  --curva-entrada: cubic-bezier(0.2, 0.7, 0.2, 1);
 }

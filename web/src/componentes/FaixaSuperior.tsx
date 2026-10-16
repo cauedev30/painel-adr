@@ -11,7 +11,8 @@ export function FaixaSuperior({ rota, navegar }: Props) {
   return (
     <header className={css.faixa}>
       <div className={css.titulo}>
-        <h1>{tela.nome}</h1>
+        {/* a key remonta o título a cada tela, e ele entra com fade */}
+        <h1 key={tela.id}>{tela.nome}</h1>
         <p className={css.corte}>dados até {data(DATA_DE_CORTE)}</p>
       </div>
       {tela.filtros && <Filtros rota={rota} navegar={navegar} />}

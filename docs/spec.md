@@ -259,7 +259,13 @@ faixas, consulta ao catálogo (`information_schema`) para gerar o DER.
   candidatura · dados simulados" e "por Cauê Franco", com link para https://github.com/cauedev30/painel-adr);
   faixa superior com o nome da tela, os filtros e "dados até 30/09/2026".
 - **Celular:** tudo empilha e continua legível.
-- **Acessibilidade:** contraste AA no texto; foco visível; navegação por teclado; tabela por gráfico.
+- **Movimento (2026-10-15):** ao trocar de tela, cada bloco entra com fade e sobe 6 px (320 ms), em
+  cascata de 40 ms, e os KPIs entram um a um; o título da tela troca com fade; as barras dos gráficos
+  crescem em 600 ms, 30 ms uma depois da outra (no máximo 300 ms de atraso); a barra vendido × estoque
+  cresce da esquerda. Trocar o filtro não refaz a entrada da tela. Os tempos estão em `tokens.css` e em
+  `animacaoDosGraficos` (`tema/echarts.ts`).
+- **Acessibilidade:** contraste AA no texto; foco visível; navegação por teclado; tabela por gráfico;
+  com "reduzir movimento" ligado no sistema, nada anima (nem o CSS nem o ECharts).
 
 ## 7. Arquitetura e stack
 
