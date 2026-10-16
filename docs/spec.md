@@ -41,7 +41,7 @@ confiável e transformá-las em resposta para a diretoria.
 | Dashboards interativos | 5 telas com filtros |
 | KPIs | VGV, VSO, estoque, ticket médio, preço/m², inadimplência, conversão do funil |
 | Comunicar insights | A frase-resposta de cada cartão |
-| Estatística descritiva e outliers | Preço/m²: média, mediana, moda, desvio padrão, percentis, boxplot e IQR |
+| Estatística descritiva e outliers | Preço/m²: boxplot com mediana, quartis e IQR no painel; média, moda, desvio padrão e percentis no notebook e em `preco_m2_estatisticas.sql` |
 | Python (Pandas, NumPy, Matplotlib) | Pipeline e notebook |
 | PostgreSQL | Banco real (PGlite), `.sql` em Postgres puro |
 | Portfólio no GitHub | Repositório público e site no GitHub Pages |
@@ -71,6 +71,7 @@ Lacunas assumidas e adiadas: planilhas avançadas (xlsx com PROCX) e ferramenta 
 | D9 | ~~O "Ver SQL" mostra o mesmo arquivo `.sql` que o gráfico executa~~ Revogada por D12 | O painel roda o arquivo de `sql/consultas/` tal como está no repositório |
 | D10 | Publicação automática pelo GitHub Actions, bloqueada se qualquer teste falhar | O link enviado nunca quebra por mudança |
 | D11 | Volume ajustado para ≈ 390 unidades e ≈ 280 vendas (antes estimado em 700 e 450) | Só 4 empreendimentos estão à venda; prédios de compactos têm 60 a 140 unidades |
+| D13 | Painel mais intuitivo (2026-10-16): saem o KPI preço/m² e os cartões de estatística do preço/m², de vista mar e de distratos; VGV e VSO ganham o nome por extenso; os filtros viram 2 botões com ícone e resumo, que abrem um painel flutuante (atalhos de período de um clique e a lista de empreendimentos) | Mesma razão do D12: a apresentação ao CEO; menos cartões, termos claros e filtro de um clique |
 | D12 | Painel enxuto (2026-10-15): saem o "Ver SQL", o tempo da consulta, o Console SQL, o DER da tela Dados e "O que os dados dizem"; fica o "ver como tabela"; o nome sob o logo vira "Inteligência comercial" | A entrevista é presencial, com o CEO da ADR, que não é técnico; o SQL continua no repositório, no README e no notebook |
 
 ## 3. Dados
@@ -221,25 +222,27 @@ faixas, consulta ao catálogo (`information_schema`) para gerar o DER.
 
 ### 6.1 Telas
 
-1. **Visão geral:** faixa com foto noturna de um Mares; 6 KPIs grandes (VGV vendido, VSO, estoque,
-   ticket médio, preço/m², inadimplência), cada um com variação contra o mês anterior (▲/▼ com texto);
-   vendas mensais com a linha da meta.
+1. **Visão geral:** faixa com foto noturna de um Mares; 5 KPIs grandes em 3 + 2 (VGV vendido, VSO,
+   estoque, ticket médio, inadimplência; VGV e VSO com o nome por extenso), cada um com variação contra
+   o período anterior (▲/▼ com texto); vendas mensais com a linha da meta.
 2. **Vendas e estoque:** cartão por empreendimento (foto, status, barra vendido × estoque, VSO);
    ritmo de vendas acumulado desde o lançamento, um gráfico pequeno por empreendimento; boxplot do
-   preço/m² com outliers e tabela de média, mediana, moda, desvio padrão, P25, P50, P75 e P90, com "?"
-   explicando cada termo.
+   preço/m² com outliers. (A tabela de estatísticas e a vista mar saíram pelo D13.)
 3. **Funil e corretores:** funil horizontal com conversão entre etapas; leads e conversão por canal;
    ranking de corretores com variação de posição contra o mês anterior.
 4. **Recebíveis:** KPIs (a receber em 12 meses, recebido no mês, inadimplência); previsto × recebido
-   por mês; saldo por faixa de atraso; mapa de calor empreendimento × faixa.
+   por mês; saldo por faixa de atraso; mapa de calor empreendimento × faixa; inadimplência por
+   empreendimento e por desconto. (Os distratos saíram pelo D13.)
 5. **Dados:** relatório de qualidade em cartões "antes → depois"; o que é real e o que é simulado.
    (O DER e o Console SQL saíram do painel pelo D12; os `.sql` deles ficam no repositório.)
 
 ### 6.2 Componentes comuns
 
 - **Cartão:** título-pergunta, frase-resposta calculada dos dados, gráfico e "ver como tabela".
-- **Filtros:** período e empreendimento, numa linha só no topo; valem para todos os cartões da tela.
-  Rótulo em Lexend Deca, letra normal; caixa lisa, com o cobre só no hover e no foco.
+- **Filtros:** 2 botões no topo, com ícone e o filtro ativo ("out 25 – set 26", "Todos"); valem para
+  todos os cartões da tela. Cada um abre um painel flutuante: o período com os atalhos "Últimos 12
+  meses", "Este ano" e "Tudo" e o De/Até; o empreendimento, numa lista. Fecha com Esc, clique fora ou ao
+  escolher.
 - **Balão ao passar o mouse:** valor exato em formato brasileiro (R$ 12,4 mi; 8,1%; 30/09/2026).
 - **Tela de carregamento:** logo ADR e "Carregando o banco PostgreSQL no seu navegador…".
 

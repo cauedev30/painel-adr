@@ -23,6 +23,8 @@ export type LinhaKpi = { valor: number | null; valor_anterior: number | null }
 export type DefinicaoKpi = {
   id: string
   titulo: string
+  /** A sigla por extenso, numa linha menor abaixo do título (VGV, VSO). */
+  extenso?: string
   consulta: string
   formato: (valor: number) => string
   /** Fração (VSO, inadimplência) compara em pontos percentuais; o resto, em variação relativa. */
@@ -36,13 +38,12 @@ export type DefinicaoKpi = {
   comparacao?: 'periodo' | 'mes' | 'fim'
 }
 
-/** Os 6 KPIs da visão geral (seção 6.1), com as definições da seção 3.4. */
+/** Os 5 KPIs da visão geral (seção 6.1), com as definições da seção 3.4. */
 export const KPIS: DefinicaoKpi[] = [
-  { id: 'vgv', titulo: 'VGV vendido', consulta: 'visao-geral/kpi_vgv', formato: moedaCompacta, modo: 'relativa', subirEhBom: true },
-  { id: 'vso', titulo: 'VSO', consulta: 'visao-geral/kpi_vso', formato: (v) => pct(v), modo: 'pontos', subirEhBom: true },
+  { id: 'vgv', titulo: 'VGV vendido', extenso: 'Valor Geral de Vendas', consulta: 'visao-geral/kpi_vgv', formato: moedaCompacta, modo: 'relativa', subirEhBom: true },
+  { id: 'vso', titulo: 'VSO', extenso: 'Vendas sobre Oferta', consulta: 'visao-geral/kpi_vso', formato: (v) => pct(v), modo: 'pontos', subirEhBom: true },
   { id: 'estoque', titulo: 'Estoque', consulta: 'visao-geral/kpi_estoque', formato: (v) => `${inteiro(v)} unidades`, modo: 'relativa', subirEhBom: false, comparacao: 'fim' },
   { id: 'ticket_medio', titulo: 'Ticket médio', consulta: 'visao-geral/kpi_ticket_medio', formato: moedaCompacta, modo: 'relativa', subirEhBom: true },
-  { id: 'preco_m2', titulo: 'Preço por m²', consulta: 'visao-geral/kpi_preco_m2', formato: reais, modo: 'relativa', subirEhBom: true },
   { id: 'inadimplencia', titulo: 'Inadimplência', consulta: 'visao-geral/kpi_inadimplencia', formato: (v) => pct(v), modo: 'pontos', subirEhBom: false, comparacao: 'fim' },
 ]
 
@@ -112,28 +113,6 @@ export function respostaDistribuicao(linhas: LinhaCaixa[]): string {
   const ordem = [...linhas].sort((a, b) => a.mediana - b.mediana)
   const [menor, maior] = [ordem[0], ordem.at(-1)!]
   return `A mediana vai de ${reais(menor.mediana)} por m² no ${menor.nome} a ${reais(maior.mediana)} no ${maior.nome}, e ${foraDaCurva}`
-}
-
-export type LinhaEstatisticas = {
-  n: number; media: number | null; mediana: number | null; moda: number | null; desvio_padrao: number | null
-  p25: number | null; p50: number | null; p75: number | null; p90: number | null
-}
-
-export function respostaEstatisticas([l]: LinhaEstatisticas[]): string {
-  if (!l || l.n === 0 || l.mediana === null || l.media === null) return 'Sem vendas no período'
-  return `Metade das ${inteiro(l.n)} vendas saiu acima de ${reais(l.mediana)} por m²; a média é ${reais(l.media)}`
-}
-
-export type LinhaVistaMar = { vista_mar: boolean; unidades: number; vendas: number; preco_m2_medio: number | null; pct_vendidas_6_meses: number | null }
-
-export function respostaVistaMar(linhas: LinhaVistaMar[]): string {
-  const com = linhas.find((l) => l.vista_mar)
-  const sem = linhas.find((l) => !l.vista_mar)
-  if (!com?.preco_m2_medio || !sem?.preco_m2_medio) return 'Sem vendas com e sem vista mar no período para comparar'
-  const premio = com.preco_m2_medio / sem.preco_m2_medio - 1
-  const preco = `Com vista mar, o m² sai ${pct(Math.abs(premio), 0)} ${premio >= 0 ? 'mais caro' : 'mais barato'}`
-  if (com.pct_vendidas_6_meses === null || sem.pct_vendidas_6_meses === null) return preco
-  return `${preco}, e ${pct(com.pct_vendidas_6_meses, 0)} das unidades venderam em 6 meses, contra ${pct(sem.pct_vendidas_6_meses, 0)} sem vista`
 }
 
 // ---- Funil e corretores ----
@@ -274,16 +253,6 @@ export function respostaInadDesconto(linhas: LinhaInadDesconto[]): string {
   const baixo = linhas.find((l) => l.ordem === 1)
   const contra = baixo && baixo !== pior && baixo.inadimplencia !== null ? `, contra ${pct(baixo.inadimplencia)} nas de até 3%` : ''
   return `Nas vendas com desconto de ${pior.faixa_desconto}, ${pct(pior.inadimplencia!)} do vencido está em aberto${contra}`
-}
-
-export type LinhaDistratos = { distratos: number; com_atraso_60: number; pct: number | null }
-
-export function respostaDistratos([l]: LinhaDistratos[]): string {
-  if (!l || l.distratos === 0) return 'Nenhum distrato no período'
-  const depois = 'depois de uma parcela com mais de 60 dias de atraso'
-  if (l.distratos === 1) return l.com_atraso_60 === 1 ? `O único distrato do período veio ${depois}` : 'O único distrato do período não teve atraso acima de 60 dias antes'
-  if (l.com_atraso_60 === l.distratos) return `Os ${inteiro(l.distratos)} distratos do período vieram ${depois}`
-  return `${inteiro(l.com_atraso_60)} dos ${inteiro(l.distratos)} distratos do período (${pct(l.pct ?? 0, 0)}) vieram ${depois}`
 }
 
 // ---- Dados ----

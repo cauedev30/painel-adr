@@ -1,6 +1,7 @@
 // A tela e os filtros moram no hash da URL (D5.2): #/visao-geral?de=2025-10&ate=2026-09&emp=2.
 // Assim o link com filtro pode ser compartilhado, e o GitHub Pages não dá 404 ao recarregar a página.
 import { EMPREENDIMENTOS } from '../empreendimentos.ts'
+import { mesCurto } from '../formatar.ts'
 
 // filtros: a tela tem cartões que mudam com o período e o empreendimento (Dados não tem)
 export const TELAS = [
@@ -77,6 +78,23 @@ function ultimoDia(anoMes: string): string {
 
 /** Todos os meses dos dados, de jan/2023 a set/2026, em AAAA-MM (as opções dos filtros de período). */
 export const MESES_DOS_DADOS: string[] = Array.from({ length: 45 }, (_, i) => somarMeses(PRIMEIRO_MES, i))
+
+/** Os atalhos de um clique do filtro de período, contados a partir do último mês dos dados. */
+export const ATALHOS_DE_PERIODO = [
+  { id: '12m', nome: 'Últimos 12 meses', de: somarMeses(ULTIMO_MES, -11), ate: ULTIMO_MES },
+  { id: 'ano', nome: 'Este ano', de: `${ULTIMO_MES.slice(0, 4)}-01`, ate: ULTIMO_MES },
+  { id: 'tudo', nome: 'Tudo', de: PRIMEIRO_MES, ate: ULTIMO_MES },
+] as const
+
+/** O atalho que bate com o período da rota, ou null (período escolhido à mão). */
+export function atalhoAtivo(rota: Rota): (typeof ATALHOS_DE_PERIODO)[number]['id'] | null {
+  return ATALHOS_DE_PERIODO.find((a) => a.de === rota.de && a.ate === rota.ate)?.id ?? null
+}
+
+/** O período escrito curto, no botão do filtro: "out 25 – set 26"; um mês só: "set 26". */
+export function resumoDoPeriodo(rota: Rota): string {
+  return rota.de === rota.ate ? mesCurto(rota.de) : `${mesCurto(rota.de)} – ${mesCurto(rota.ate)}`
+}
 
 /** Os parâmetros $1, $2 e $3 das consultas filtráveis: início no dia 1, fim no último dia do mês. */
 export function paramsDaRota(rota: Rota): [string, string, number | null] {

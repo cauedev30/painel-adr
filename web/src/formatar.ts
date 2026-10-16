@@ -65,6 +65,12 @@ export function mes(anoMes: string): string {
   return `${MES.format(d).replace('.', '')}/${d.getUTCFullYear()}`
 }
 
+/** O mês curto do botão do filtro: "out 25". */
+export function mesCurto(anoMes: string): string {
+  const d = paraData(`${anoMes}-01`)
+  return `${MES.format(d).replace('.', '')} ${String(d.getUTCFullYear()).slice(2)}`
+}
+
 export type Variacao = { seta: '▲' | '▼' | '='; texto: string }
 
 /** A seta sai do próprio texto arredondado: o que aparece como 0,0% é "=". */

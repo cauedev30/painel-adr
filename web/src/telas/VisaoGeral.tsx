@@ -21,7 +21,7 @@ export function VisaoGeral({ rota }: PropsDaTela) {
         <figcaption>Mares Seaview à noite</figcaption>
       </figure>
 
-      <section aria-label="Indicadores do período" className={css.kpis}>
+      <section aria-label="Indicadores do período" className={`${css.kpis} ${css.kpisCinco}`}>
         {KPIS.map((k) => <Kpi key={k.id} kpi={k} params={params} periodoAnterior={textoDaComparacao(k, rota)} />)}
       </section>
 

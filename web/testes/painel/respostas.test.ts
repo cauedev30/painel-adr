@@ -1,9 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { GLOSSARIO } from '../../src/glossario.ts'
 import {
-  KPIS, type LinhaEmpreendimento, type LinhaRanking, canalQueMaisConverte, lerKpi, respostaCanais, respostaDistribuicao, respostaEmpreendimentos, respostaEstatisticas, respostaRitmo,
-  KPIS_RECEBIVEIS, respostaDistratos, respostaQualidade, textoDaComparacao, respostaFaixas, respostaFunil, respostaInadDesconto, respostaInadEmpreendimento,
-  respostaMapaCalor, respostaPrevistoRecebido, respostaRanking, respostaVendasMensais, respostaVistaMar, variacaoDePosicao,
+  KPIS, type LinhaEmpreendimento, type LinhaRanking, canalQueMaisConverte, lerKpi, respostaCanais, respostaDistribuicao, respostaEmpreendimentos, respostaRitmo,
+  KPIS_RECEBIVEIS, respostaQualidade, textoDaComparacao, respostaFaixas, respostaFunil, respostaInadDesconto, respostaInadEmpreendimento,
+  respostaMapaCalor, respostaPrevistoRecebido, respostaRanking, respostaVendasMensais, variacaoDePosicao,
 } from '../../src/telas/respostas.ts'
 import { abrirBanco, rodar } from '../apoio/banco.ts'
 
@@ -47,10 +46,10 @@ describe('leitura dos KPIs', () => {
       .toEqual({ valor: '2,3%', variacao: { seta: '▼', texto: '-1,1 p.p.' }, tom: 'bom' })
   })
 
-  it('VSO em pontos percentuais; preço/m² em reais sem centavos', () => {
+  it('VSO em pontos percentuais; valor igual ao anterior é neutro', () => {
     expect(lerKpi(kpi('vso'), { valor: 0.241, valor_anterior: 0.2 }).variacao).toEqual({ seta: '▲', texto: '+4,1 p.p.' })
-    expect(lerKpi(kpi('preco_m2'), { valor: 17_212.4, valor_anterior: 17_212.4 }))
-      .toEqual({ valor: 'R$ 17.212', variacao: { seta: '=', texto: '0,0%' }, tom: 'neutro' })
+    expect(lerKpi(kpi('ticket_medio'), { valor: 300_000, valor_anterior: 300_000 }))
+      .toEqual({ valor: 'R$ 300 mil', variacao: { seta: '=', texto: '0,0%' }, tom: 'neutro' })
   })
 
   it('período sem venda: traço no valor, sem comparação, e nada quebrado', () => {
@@ -59,10 +58,16 @@ describe('leitura dos KPIs', () => {
     expect(lerKpi(kpi('ticket_medio'), { valor: 300_000, valor_anterior: null }).variacao.texto).toBe('sem comparação')
   })
 
-  it('os 6 KPIs da seção 6.1, cada um com a sua consulta', () => {
+  it('os 5 KPIs da seção 6.1, cada um com a sua consulta', () => {
     expect(KPIS.map((k) => k.consulta)).toEqual([
       'visao-geral/kpi_vgv', 'visao-geral/kpi_vso', 'visao-geral/kpi_estoque',
-      'visao-geral/kpi_ticket_medio', 'visao-geral/kpi_preco_m2', 'visao-geral/kpi_inadimplencia',
+      'visao-geral/kpi_ticket_medio', 'visao-geral/kpi_inadimplencia',
+    ])
+  })
+
+  it('VGV e VSO trazem a sigla por extenso', () => {
+    expect(KPIS.filter((k) => k.extenso).map((k) => [k.id, k.extenso])).toEqual([
+      ['vgv', 'Valor Geral de Vendas'], ['vso', 'Vendas sobre Oferta'],
     ])
   })
 })
@@ -91,21 +96,6 @@ describe('frases de Vendas e estoque', () => {
     expect(respostaDistribuicao([c('Mares A', 17433.41, []), c('Mares B', 16223.36, [21000])]))
       .toBe('A mediana vai de R$ 16.223 por m² no Mares B a R$ 17.433 no Mares A, e 1 venda fora da curva')
     expect(respostaDistribuicao([c('Mares A', 17000, [])])).toBe('Mediana de R$ 17.000 por m², e nenhuma venda fora da curva')
-  })
-
-  it('estatísticas e vista mar', () => {
-    const vazio = { n: 0, media: null, mediana: null, moda: null, desvio_padrao: null, p25: null, p50: null, p75: null, p90: null }
-    expect(respostaEstatisticas([vazio])).toBe('Sem vendas no período')
-    expect(respostaEstatisticas([{ ...vazio, n: 72, media: 17240.98, mediana: 17275.75 }])).toBe('Metade das 72 vendas saiu acima de R$ 17.276 por m²; a média é R$ 17.241')
-    expect(respostaVistaMar([
-      { vista_mar: true, unidades: 132, vendas: 31, preco_m2_medio: 18192.77, pct_vendidas_6_meses: 0.462 },
-      { vista_mar: false, unidades: 258, vendas: 41, preco_m2_medio: 16521.33, pct_vendidas_6_meses: 0.337 },
-    ])).toBe('Com vista mar, o m² sai 10% mais caro, e 46% das unidades venderam em 6 meses, contra 34% sem vista')
-  })
-
-  it('o glossário explica todo termo da tabela de estatísticas', () => {
-    expect(Object.keys(GLOSSARIO).sort()).toEqual(['desvio_padrao', 'media', 'mediana', 'moda', 'p25', 'p50', 'p75', 'p90'])
-    for (const { explicacao } of Object.values(GLOSSARIO)) expect(explicacao.length).toBeGreaterThan(20)
   })
 })
 
@@ -186,12 +176,6 @@ describe('frases de Recebíveis', () => {
     expect(respostaInadDesconto([d('0–3%', 1, 0.024), d('3–8%', 2, 0.0129), d('8% ou mais', 3, 0.0685)]))
       .toBe('Nas vendas com desconto de 8% ou mais, 6,9% do vencido está em aberto, contra 2,4% nas de até 3%')
     expect(respostaInadDesconto([d('0–3%', 1, null)])).toBe('Sem parcela vencida neste filtro')
-  })
-
-  it('distratos', () => {
-    expect(respostaDistratos([{ distratos: 0, com_atraso_60: 0, pct: null }])).toBe('Nenhum distrato no período')
-    expect(respostaDistratos([{ distratos: 4, com_atraso_60: 4, pct: 1 }])).toBe('Os 4 distratos do período vieram depois de uma parcela com mais de 60 dias de atraso')
-    expect(respostaDistratos([{ distratos: 4, com_atraso_60: 3, pct: 0.75 }])).toBe('3 dos 4 distratos do período (75%) vieram depois de uma parcela com mais de 60 dias de atraso')
   })
 })
 

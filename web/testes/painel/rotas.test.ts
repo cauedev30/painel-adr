@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
-  MESES_DOS_DADOS, PADRAO, PRIMEIRO_MES, TELAS, ULTIMO_MES, escreverHash, lerHash, linkDoCartao, paramsDaRota, periodoAnterior,
+  ATALHOS_DE_PERIODO, MESES_DOS_DADOS, PADRAO, PRIMEIRO_MES, TELAS, ULTIMO_MES, atalhoAtivo, escreverHash, lerHash, linkDoCartao,
+  paramsDaRota, periodoAnterior, resumoDoPeriodo,
 } from '../../src/navegacao/rotas.ts'
 
 describe('as telas', () => {
@@ -54,6 +55,26 @@ describe('os meses do filtro', () => {
     expect(MESES_DOS_DADOS.at(-1)).toBe(ULTIMO_MES)
     expect(new Set(MESES_DOS_DADOS).size).toBe(MESES_DOS_DADOS.length)
     expect(MESES_DOS_DADOS).toContain('2024-02')
+  })
+})
+
+describe('o botão do período', () => {
+  it('os atalhos: últimos 12 meses (o padrão), este ano e tudo', () => {
+    expect(ATALHOS_DE_PERIODO.map(({ id, de, ate }) => [id, de, ate])).toEqual([
+      ['12m', '2025-10', '2026-09'], ['ano', '2026-01', '2026-09'], ['tudo', PRIMEIRO_MES, ULTIMO_MES],
+    ])
+    expect(atalhoAtivo(PADRAO)).toBe('12m')
+  })
+
+  it('o atalho ativo é o que bate com o período; à mão, nenhum', () => {
+    expect(atalhoAtivo(lerHash('#/visao-geral?de=2023-01&ate=2026-09'))).toBe('tudo')
+    expect(atalhoAtivo(lerHash('#/visao-geral?de=2026-01&ate=2026-09'))).toBe('ano')
+    expect(atalhoAtivo(lerHash('#/visao-geral?de=2026-02&ate=2026-09'))).toBeNull()
+  })
+
+  it('o resumo: "out 25 – set 26"; um mês só, sem traço', () => {
+    expect(resumoDoPeriodo(PADRAO)).toBe('out 25 – set 26')
+    expect(resumoDoPeriodo(lerHash('#/visao-geral?de=2026-09&ate=2026-09'))).toBe('set 26')
   })
 })
 

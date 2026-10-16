@@ -23,6 +23,7 @@ export function Kpi({ kpi, params, periodoAnterior }: Props) {
   return (
     <article className={css.kpi} aria-labelledby={`kpi-${kpi.id}`} aria-busy={carregando}>
       <h3 id={`kpi-${kpi.id}`} className={css.titulo}>{kpi.titulo}</h3>
+      {kpi.extenso && <p className={css.extenso}>{kpi.extenso}</p>}
       {erro ? (
         <p className={css.erro} role="alert">A consulta falhou.</p>
       ) : (

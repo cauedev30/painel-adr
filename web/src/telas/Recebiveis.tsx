@@ -4,8 +4,8 @@ import { inteiro, mes, moedaCompacta, pct } from '../formatar.ts'
 import { paramsDaRota } from '../navegacao/rotas.ts'
 import { PALETA, RAMPA_ATRASO } from '../tema/paleta.ts'
 import {
-  ICONES_DAS_FAIXAS, KPIS_RECEBIVEIS, type LinhaDistratos, type LinhaFaixa, type LinhaInadDesconto,
-  type LinhaInadEmpreendimento, type LinhaMapaCalor, type LinhaPrevistoRecebido, respostaDistratos, respostaFaixas,
+  ICONES_DAS_FAIXAS, KPIS_RECEBIVEIS, type LinhaFaixa, type LinhaInadDesconto,
+  type LinhaInadEmpreendimento, type LinhaMapaCalor, type LinhaPrevistoRecebido, respostaFaixas,
   respostaInadDesconto, respostaInadEmpreendimento, respostaMapaCalor, respostaPrevistoRecebido, rotuloDaFaixa, textoDaComparacao,
 } from './respostas.ts'
 import css from './Telas.module.css'
@@ -142,20 +142,6 @@ export function Recebiveis({ rota }: PropsDaTela) {
         />
       </div>
 
-      <Cartao<LinhaDistratos>
-        id="distratos"
-        titulo="O distrato costuma vir depois de um atraso longo?"
-        consulta="recebiveis/distratos_e_atraso"
-        params={params}
-        resposta={respostaDistratos}
-        altura={90}
-        conteudo={([l]) => <Distratos linha={l} />}
-        colunas={[
-          { chave: 'distratos', titulo: 'Distratos no período', numerica: true, formato: inteiro },
-          { chave: 'com_atraso_60', titulo: 'Com atraso acima de 60 dias antes', numerica: true, formato: inteiro },
-          { chave: 'pct', titulo: 'Parte', numerica: true, formato: (v: number | null) => (v === null ? '—' : pct(v, 0)) },
-        ]}
-      />
     </div>
   )
 }
@@ -198,16 +184,5 @@ function MapaCalor({ linhas }: { linhas: LinhaMapaCalor[] }) {
         </tbody>
       </table>
     </div>
-  )
-}
-
-function Distratos({ linha }: { linha: LinhaDistratos }) {
-  if (linha.distratos === 0) return null
-  return (
-    <dl className={css.numerosGrandes}>
-      <div><dt>Distratos no período</dt><dd className="numero">{inteiro(linha.distratos)}</dd></div>
-      <div><dt>Com uma parcela atrasada mais de 60 dias antes</dt><dd className="numero">{inteiro(linha.com_atraso_60)}</dd></div>
-      <div><dt>Parte dos distratos</dt><dd className="numero">{linha.pct === null ? '—' : pct(linha.pct, 0)}</dd></div>
-    </dl>
   )
 }

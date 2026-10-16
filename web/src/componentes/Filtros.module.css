@@ -1,32 +1,63 @@
+/* no celular, o painel de cada botão se posiciona pela linha inteira dos filtros (BotaoFiltro.module.css) */
 .filtros {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--esp-2);
+}
+
+/* os atalhos do período: pílulas, a ativa em cobre */
+.atalhos {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-end;
-  gap: var(--esp-4);
+  gap: 6px;
 }
 
-.grupo {
-  margin: 0;
-  padding: 0;
-  border: 0;
+.atalhos button {
+  padding: 6px var(--esp-3);
+  background: none;
+  border: 1px solid var(--borda);
+  border-radius: 999px;
+  color: var(--texto-2);
+  font-size: var(--tamanho-pequeno);
+  transition: color 0.2s, border-color 0.2s, background-color 0.2s;
+}
+
+.atalhos button:hover {
+  color: var(--texto);
+  border-color: color-mix(in srgb, var(--cobre) 55%, var(--borda));
+}
+
+.atalhos button[aria-pressed='true'] {
+  color: var(--texto);
+  border-color: var(--cobre);
+  background: color-mix(in srgb, var(--cobre) 14%, transparent);
+}
+
+/* o período exato, embaixo dos atalhos */
+.exato {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--esp-3);
+  margin-top: var(--esp-4);
+  padding-top: var(--esp-4);
+  border-top: 1px solid var(--borda);
+}
+
+.exato label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   min-width: 0;
-}
-
-/* rótulo em letra normal, na fonte do texto: a Lexend Zetta fica só nos títulos de tela */
-.rotulo {
-  padding: 0;
-  margin-bottom: 6px;
-  font-family: var(--fonte-texto);
   font-size: 0.75rem;
   color: var(--texto-2);
 }
 
-/* a peça: lisa, com borda fina; o cobre só no hover e no foco */
+/* o select: liso, com borda fina; o cobre só no hover e no foco */
 .caixa {
   display: flex;
   align-items: center;
   height: 40px;
-  padding: 0 var(--esp-1);
   background: var(--superficie);
   border: 1px solid var(--borda);
   border-radius: var(--raio-pequeno);
@@ -44,12 +75,14 @@
 
 .seletor {
   position: relative;
-  display: inline-flex;
+  display: flex;
+  flex: 1;
   align-items: center;
 }
 
 .seletor select {
   appearance: none;
+  width: 100%;
   height: 38px;
   padding: 0 calc(var(--esp-3) + 18px) 0 var(--esp-3);
   background: transparent;
@@ -82,35 +115,47 @@
   color: var(--cobre);
 }
 
-.traco {
-  color: var(--texto-2);
-  padding: 0 var(--esp-1);
+/* a lista de empreendimentos: o escolhido em branco, com o traço de marcado em cobre */
+.lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
-.empreendimento .seletor,
-.empreendimento select {
+.lista button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--esp-3);
   width: 100%;
+  padding: var(--esp-2) var(--esp-3);
+  background: none;
+  border: 0;
+  border-radius: var(--raio-pequeno);
+  color: var(--texto-2);
+  font-size: 0.875rem;
+  text-align: left;
+  transition: color 0.2s, background-color 0.2s;
 }
 
-.empreendimento select {
-  min-width: 196px;
+.lista button:hover {
+  color: var(--texto);
+  background: var(--superficie);
+}
+
+.lista button[aria-pressed='true'] {
+  color: var(--texto);
+}
+
+.lista button svg {
+  color: var(--cobre);
 }
 
 @media (max-width: 899px) {
   .filtros {
     width: 100%;
-  }
-
-  .grupo {
-    flex: 1 1 100%;
-  }
-
-  .caixa .seletor {
-    flex: 1;
-  }
-
-  .caixa select {
-    width: 100%;
-    min-width: 0;
   }
 }

@@ -1,15 +1,13 @@
-import { useState } from 'react'
 import { Cartao } from '../componentes/Cartao.tsx'
 import { FotoEmpreendimento } from '../componentes/FotoEmpreendimento.tsx'
 import { Grafico } from '../componentes/Grafico.tsx'
 import { EMPREENDIMENTOS, STATUS } from '../empreendimentos.ts'
 import { inteiro, moedaCompacta, pct, reais } from '../formatar.ts'
-import { GLOSSARIO } from '../glossario.ts'
 import { paramsDaRota } from '../navegacao/rotas.ts'
 import { PALETA } from '../tema/paleta.ts'
 import {
-  type LinhaCaixa, type LinhaEmpreendimento, type LinhaEstatisticas, type LinhaRitmo, type LinhaVistaMar,
-  respostaDistribuicao, respostaEmpreendimentos, respostaEstatisticas, respostaRitmo, respostaVistaMar,
+  type LinhaCaixa, type LinhaEmpreendimento, type LinhaRitmo,
+  respostaDistribuicao, respostaEmpreendimentos, respostaRitmo,
 } from './respostas.ts'
 import css from './Telas.module.css'
 import type { PropsDaTela } from './tipos.ts'
@@ -74,39 +72,6 @@ export function VendasEstoque({ rota }: PropsDaTela) {
           { chave: 'q3', titulo: 'Q3', numerica: true, formato: reais },
           { chave: 'maximo', titulo: 'Máximo', numerica: true, formato: reais },
           { chave: 'outliers', titulo: 'Fora da curva', formato: (o: number[]) => (o.length === 0 ? 'nenhuma' : o.map(reais).join('; ')) },
-        ]}
-      />
-
-      <Cartao<LinhaEstatisticas>
-        id="estatisticas"
-        titulo="Qual o preço por m² típico, e quanto ele varia?"
-        consulta="vendas-estoque/preco_m2_estatisticas"
-        params={params}
-        resposta={respostaEstatisticas}
-        altura={110}
-        conteudo={([l]) => <Estatisticas linha={l} />}
-        colunas={[
-          { chave: 'n', titulo: 'Vendas', numerica: true, formato: inteiro },
-          ...(['media', 'mediana', 'moda', 'desvio_padrao', 'p25', 'p50', 'p75', 'p90'] as const).map((chave) => ({
-            chave, titulo: GLOSSARIO[chave].termo, numerica: true, formato: (v: number | null) => (v === null ? '—' : reais(v)),
-          })),
-        ]}
-      />
-
-      <Cartao<LinhaVistaMar>
-        id="vista-mar"
-        titulo="A vista mar faz a unidade valer mais e vender mais rápido?"
-        consulta="vendas-estoque/vista_mar"
-        params={params}
-        resposta={respostaVistaMar}
-        altura={110}
-        conteudo={(linhas) => <VistaMar linhas={linhas} />}
-        colunas={[
-          { chave: 'vista_mar', titulo: 'Vista mar', formato: (v: boolean) => (v ? 'com vista' : 'sem vista') },
-          { chave: 'unidades', titulo: 'Unidades', numerica: true, formato: inteiro },
-          { chave: 'vendas', titulo: 'Vendas no período', numerica: true, formato: inteiro },
-          { chave: 'preco_m2_medio', titulo: 'Preço médio do m²', numerica: true, formato: (v: number | null) => (v === null ? '—' : reais(v)) },
-          { chave: 'pct_vendidas_6_meses', titulo: 'Vendidas nos 6 primeiros meses', numerica: true, formato: (v: number | null) => (v === null ? '—' : pct(v, 0)) },
         ]}
       />
     </div>
@@ -239,66 +204,4 @@ function graficoDaCaixa(linhas: LinhaCaixa[]) {
       },
     ],
   }
-}
-
-/** As estatísticas do preço/m², cada uma com o "?" que explica o termo numa frase. */
-function Estatisticas({ linha }: { linha: LinhaEstatisticas }) {
-  const [aberto, setAberto] = useState<string | null>(null)
-  const chaves = ['media', 'mediana', 'moda', 'desvio_padrao', 'p25', 'p50', 'p75', 'p90'] as const
-  if (linha.n === 0) return null  // a frase-resposta já diz que não há vendas
-  return (
-    <div className={css.estatisticas}>
-      <dl>
-        {chaves.map((chave) => {
-          const valor = linha[chave]
-          const { termo, explicacao } = GLOSSARIO[chave]
-          return (
-            <div key={chave} className={css.estatistica}>
-              <dt>
-                {termo}
-                <button type="button" className={css.ajuda} aria-expanded={aberto === chave} aria-controls={`ajuda-${chave}`}
-                  aria-label={`O que é ${termo}?`} onClick={() => setAberto(aberto === chave ? null : chave)}>?</button>
-              </dt>
-              <dd className="numero">{valor === null ? '—' : reais(valor)}</dd>
-              <p id={`ajuda-${chave}`} className={css.explicacao} hidden={aberto !== chave}>{explicacao}</p>
-            </div>
-          )
-        })}
-      </dl>
-      <p className={css.notaRodape}>Sobre {inteiro(linha.n)} {linha.n === 1 ? 'venda' : 'vendas'} do período.</p>
-    </div>
-  )
-}
-
-/** Dois gráficos pequenos, um eixo cada: o preço do m² e a parte vendida nos 6 primeiros meses. */
-function VistaMar({ linhas }: { linhas: LinhaVistaMar[] }) {
-  const com = linhas.find((l) => l.vista_mar)!
-  const sem = linhas.find((l) => !l.vista_mar)!
-  if (com.preco_m2_medio === null && sem.preco_m2_medio === null && com.pct_vendidas_6_meses === null && sem.pct_vendidas_6_meses === null) return null
-  const categorias = ['Com vista mar', 'Sem vista']
-  const barras = (valores: (number | null)[], formato: (v: number) => string) => ({
-    grid: { left: 104, right: 72, top: 4, bottom: 4 },
-    xAxis: { type: 'value' as const, show: false, min: 0 },
-    yAxis: { type: 'category' as const, data: categorias, inverse: true, axisLine: { show: false } },
-    tooltip: { show: false },
-    series: [{
-      type: 'bar' as const, barWidth: 20,
-      data: valores.map((v, i) => ({ value: v, itemStyle: { color: i === 0 ? PALETA.cobre : PALETA.cinza, borderRadius: [0, 4, 4, 0] } })),
-      label: { show: true, position: 'right' as const, color: PALETA.texto, formatter: (p: { value: unknown }) => (typeof p.value === 'number' ? formato(p.value) : '—') },
-    }],
-  })
-  return (
-    <div className={css.multiplosDois}>
-      <div>
-        <h3 className={css.multiploTitulo}>Preço médio do m² (vendas do período)</h3>
-        <Grafico altura={90} rotulo={`Preço médio do m²: com vista mar ${com.preco_m2_medio === null ? 'sem vendas' : reais(com.preco_m2_medio)}, sem vista ${sem.preco_m2_medio === null ? 'sem vendas' : reais(sem.preco_m2_medio)}.`}
-          opcao={barras([com.preco_m2_medio, sem.preco_m2_medio], reais)} />
-      </div>
-      <div>
-        <h3 className={css.multiploTitulo}>Unidades vendidas nos 6 primeiros meses do lançamento</h3>
-        <Grafico altura={90} rotulo={`Vendidas nos 6 primeiros meses: com vista mar ${com.pct_vendidas_6_meses === null ? '—' : pct(com.pct_vendidas_6_meses, 0)}, sem vista ${sem.pct_vendidas_6_meses === null ? '—' : pct(sem.pct_vendidas_6_meses, 0)}.`}
-          opcao={barras([com.pct_vendidas_6_meses, sem.pct_vendidas_6_meses], fracaoInteira)} />
-      </div>
-    </div>
-  )
 }

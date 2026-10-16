@@ -14,6 +14,14 @@
   color: var(--texto-2);
 }
 
+/* a sigla por extenso (VGV, VSO), para quem não é do mercado */
+.extenso {
+  margin-top: -2px;
+  font-size: 0.75rem;
+  color: var(--texto-2);
+  opacity: 0.8;
+}
+
 .valor {
   font-size: var(--tamanho-numero);
   font-weight: 600;
