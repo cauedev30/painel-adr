@@ -72,6 +72,7 @@ Lacunas assumidas e adiadas: planilhas avançadas (xlsx com PROCX) e ferramenta 
 | D10 | Publicação automática pelo GitHub Actions, bloqueada se qualquer teste falhar | O link enviado nunca quebra por mudança |
 | D11 | Volume ajustado para ≈ 390 unidades e ≈ 280 vendas (antes estimado em 700 e 450) | Só 4 empreendimentos estão à venda; prédios de compactos têm 60 a 140 unidades |
 | D13 | Painel mais intuitivo (2026-10-16): saem o KPI preço/m² e os cartões do boxplot e da estatística do preço/m², de vista mar e de distratos; VGV e VSO ganham o nome por extenso; os filtros viram 2 botões com ícone e resumo, que abrem um painel flutuante (atalhos de período de um clique e a lista de empreendimentos) | Mesma razão do D12: a apresentação ao CEO; menos cartões, termos claros e filtro de um clique |
+| D14 | O painel anima sempre (2026-10-16): as transições não seguem mais o "reduzir movimento" do sistema | O link é apresentado em máquinas que não são a do Cauê (no Windows com "Mostrar animações" desligado, nada animava); as transições são curtas e discretas |
 | D12 | Painel enxuto (2026-10-15): saem o "Ver SQL", o tempo da consulta, o Console SQL, o DER da tela Dados e "O que os dados dizem"; fica o "ver como tabela"; o nome sob o logo vira "Inteligência comercial" | A entrevista é presencial, com o CEO da ADR, que não é técnico; o SQL continua no repositório, no README e no notebook |
 
 ## 3. Dados
@@ -273,8 +274,8 @@ faixas, consulta ao catálogo (`information_schema`) para gerar o DER.
   uma depois da outra (no máximo 300 ms de atraso), e toda linha se desenha da esquerda, no mesmo ritmo
   da barra vendido × estoque. Trocar o filtro não refaz a entrada da tela: as barras mudam em 400 ms.
   Os tempos estão em `tokens.css` e em `animacaoDosGraficos` (`tema/echarts.ts`).
-- **Acessibilidade:** contraste AA no texto; foco visível; navegação por teclado; tabela por gráfico;
-  com "reduzir movimento" ligado no sistema, nada anima (nem o CSS nem o ECharts).
+- **Acessibilidade:** contraste AA no texto; foco visível; navegação por teclado; tabela por gráfico.
+  O movimento não segue o "reduzir movimento" do sistema (D14): as transições são curtas e anima sempre.
 
 ## 7. Arquitetura e stack
 

@@ -74,8 +74,7 @@ roda as consultas localmente.
 ### Painel
 - React 19, TypeScript 6 e Vite 8
 - ECharts 6 nos gráficos de barras e linhas, com um destaque em cobre e o resto em cinza
-- Transições leves: a tela entra em cascata e as barras crescem; com "reduzir movimento" ligado no
-  sistema, nada anima
+- Transições leves: a tela entra em cascata e as barras crescem, em qualquer computador
 - Vitest 5: cada consulta roda no banco gerado e precisa respeitar invariantes (o funil é decrescente,
   as faixas de atraso somam o vencido em aberto, os padrões plantados aparecem nos dados)
 

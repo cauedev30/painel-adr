@@ -61,11 +61,10 @@ export const ATRASO_DA_ENTRADA = 320
 /**
  * O movimento dos gráficos (os mesmos tempos de estilos/tokens.css): no primeiro desenho (`entrada`), as
  * barras crescem do eixo em 600 ms, depois da entrada do cartão e uma 30 ms depois da outra, e as linhas
- * se desenham da esquerda; na troca de filtro, mudam em 400 ms. Com "reduzir movimento" ligado no
- * sistema, nada anima.
+ * se desenham da esquerda; na troca de filtro, mudam em 400 ms. Anima sempre, mesmo com "reduzir
+ * movimento" ligado no sistema (D14): o painel é apresentado em máquinas que não são a do Cauê.
  */
-export function animacaoDosGraficos(reduzir: boolean, entrada = false): EChartsOption {
-  if (reduzir) return { animation: false }
+export function animacaoDosGraficos(entrada = false): EChartsOption {
   const espera = entrada ? ATRASO_DA_ENTRADA : 0
   return {
     animation: true,
@@ -85,7 +84,7 @@ export const FIM_DA_ENTRADA = ATRASO_DA_ENTRADA + ATRASO_MAXIMO + DURACAO_DA_BAR
  * animação e cortaria o crescimento das barras (o cartão muda de largura quando a barra de rolagem
  * aparece, enquanto os outros cartões carregam): durante a entrada, ele segue animado, com o mesmo ritmo.
  */
-export function animacaoDoRedimensionamento(reduzir: boolean, ms: number): { animation: { duration: number; easing: 'cubicOut' } } | undefined {
-  if (reduzir || ms >= FIM_DA_ENTRADA) return undefined
+export function animacaoDoRedimensionamento(ms: number): { animation: { duration: number; easing: 'cubicOut' } } | undefined {
+  if (ms >= FIM_DA_ENTRADA) return undefined
   return { animation: { duration: DURACAO_DA_BARRA, easing: 'cubicOut' } }
 }

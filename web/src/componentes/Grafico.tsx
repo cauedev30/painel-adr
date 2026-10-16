@@ -12,8 +12,6 @@ import { TEMA, TEMA_ECHARTS, animacaoDoRedimensionamento, animacaoDosGraficos } 
 echarts.use([BarChart, LineChart, AriaComponent, GridComponent, LegendComponent, TooltipComponent, SVGRenderer])
 echarts.registerTheme(TEMA, TEMA_ECHARTS)
 
-const reduzirMovimento = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
-
 type Props = {
   opcao: EChartsOption
   /** Descrição do gráfico para leitor de tela (o ECharts acrescenta os dados). */
@@ -37,7 +35,7 @@ export function Grafico({ opcao, rotulo, formatoDoValor = inteiro, altura = 280 
     const observador = new ResizeObserver(() => {
       const el = div.current
       if (!el || (el.clientWidth === g.getWidth() && el.clientHeight === g.getHeight())) return
-      g.resize(animacaoDoRedimensionamento(reduzirMovimento(), performance.now() - (primeiroDesenho.current ?? -Infinity)))
+      g.resize(animacaoDoRedimensionamento(performance.now() - (primeiroDesenho.current ?? -Infinity)))
     })
     observador.observe(div.current!)
     return () => {
@@ -51,7 +49,7 @@ export function Grafico({ opcao, rotulo, formatoDoValor = inteiro, altura = 280 
   useEffect(() => {
     // o balão de todo gráfico escreve os valores no formato brasileiro (formatar.ts)
     const base: EChartsOption = {
-      ...animacaoDosGraficos(reduzirMovimento(), primeiroDesenho.current === null),
+      ...animacaoDosGraficos(primeiroDesenho.current === null),
       aria: { enabled: true, label: { description: rotulo } },
       tooltip: {
         trigger: 'axis',
